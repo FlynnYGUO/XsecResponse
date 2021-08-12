@@ -1,0 +1,18 @@
+# don't include CSV files
+**/CVS*
+CVS*
+*/CVS*
+*/*/CVS*
+*/*/*/CVS*
+*/*/*/*/CVS*
+*/*/*/*/*/CVS*
+
+# don't include built objects
+bin/*
+lib/*
+.dep/*
+.obj/*
+
+*~
+*/*~
+*/*/*~
