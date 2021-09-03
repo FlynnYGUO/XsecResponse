@@ -70,7 +70,7 @@ void XsecVary::MakeVariations()
     //Osc and fluc weight: Set to 1
 
     wgtflx = 1;
-    wgtosc = 1;
+    //wgtosc = 1;
     
 
     // Determine interaction mode
@@ -81,7 +81,7 @@ void XsecVary::MakeVariations()
     if(abs(mode)==1) modee = 4; //RES
     if(abs(mode)==3) modee = 5; //COH
     if(abs(mode)==11) modee = 6; //Diffractive
-    if(abs(mode)==5) modee = 7; //Nu(
+    if(abs(mode)==5) modee = 7; //Electron scattering
     if(abs(mode)==9) modee = 9; //AMnuGamma
     if(abs(mode)==10) modee = 10; //MEC
     if(abs(mode)==4) modee = 11; //COH Elastic
@@ -98,7 +98,7 @@ void XsecVary::MakeVariations()
     int sysMode = 0;
 
     // loop over all systematics:
-    for(int i = 0; i < 1; i++)
+    for(int i = 0; (unsigned)i <  systematicProperties.size(); i++)
     {
       // loop over all interactions modes this systematic affects
       for(unsigned k = 0; k < systematicProperties[i].intModes.size(); k++)
@@ -112,8 +112,9 @@ void XsecVary::MakeVariations()
             // fill the histogram
             dev_tmp[sysMode+k][j]->Fill(pnu[0],erec,wgtflx*wgtosc*systematicProperties[i].GetWeightArray()->At(j));
             //std::cout << "BinContent: " << dev_tmp[sysMode+k][j]->FindBin(pnu[0], erec) << std::endl;
-            if(dev_tmp[sysMode+k][j]->GetBinContent(dev_tmp[sysMode+k][j]->FindBin(pnu[0], erec)) != 1) {std::cout << "Mode: "  << modee  << std::endl;}
-            //dev_tmp[sysMode+k][j]->Fill(pnu[0],erec,wgtflx*systematicProperties[i].GetWeightArray()->At(j));
+            //if(systematicProperties[i].GetWeightArray()->At(j) != 1) {std::cout << "Event: " << jentry << " || for Systematic: " << systematicProperties[i].shortName.c_str() <<  "  ||  Mode: "  << modee  << " || The knot value is: " << systematicProperties[i].GetWeightArray()->At(j) << std::endl;}
+            //std::cout << "Osc Weight = " << wgtosc << std::endl;
+            dev_tmp[sysMode+k][j]->Fill(pnu[0],erec,wgtflx*systematicProperties[i].GetWeightArray()->At(j));
 	    if(TMath::IsNaN(pnu[0])){
 	      std::cout << "pnu[0]" << pnu[0] << std::endl;
 	    } 
@@ -126,7 +127,7 @@ void XsecVary::MakeVariations()
 		//std::cout << "www is " << www << std::endl;
 		//std::cout << "wgtflux " << wgtflx << ", xsec_weight " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[0]: " << pnu[0] << ", Erec: " << erec << ", mode: " << mode << std::endl;
 	    if(TMath::IsNaN(www) || www < 0){
-		  std::cout << "weight " << www << ", wgtflux " << wgtflx << ", wgtosc " << wgtosc << ", xsec_weight " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[0]: " << pnu[0] << ", Erec: " << erec << ", mode: " << mode << std::endl;
+		  std::cout << "Sys: "<<  systematicProperties[i].shortName.c_str() <<  "  weight " << www << ", wgtflux " << wgtflx << ", wgtosc " << wgtosc << ", xsec_weight " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[0]: " << pnu[0] << ", Erec: " << erec << ", mode: " << mode << std::endl;
 	    }
           }
         }
@@ -191,8 +192,8 @@ void XsecVary::MakeVariations()
                                                 dev_tmp[sysMode+k][a]->GetBinContent(l+1,j+1)/
                                                 dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1)  :  1.));
             
-            if (dev_tmp[sysMode+k][a]->GetBinContent(l+1,j+1) != 0) {std::cout << "Value:"  << dev_tmp[sysMode+k][a]->GetBinContent(l+1,j+1) << "|| Bin number : " << l+1 << " , "  << j+1 << std::endl;
-            counter++;}
+            //if (dev_tmp[sysMode+k][a]->GetBinContent(l+1,j+1) != 0) {std::cout << "Value:"  << dev_tmp[sysMode+k][a]->GetBinContent(l+1,j+1) << "|| Bin number : " << l+1 << " , "  << j+1 << std::endl;
+            counter++;
 
  
             if(TMath::IsNaN((dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1))) || dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1) < 0){
@@ -248,11 +249,11 @@ void XsecVary::MakeVariations()
 
   // ---
   std::cout << "Filling splines..." << std::endl;
+  //std::cout << "Size check" << dev_tmp[35][0]->GetNbinsX() << std::endl;
   // ---
 
   for(unsigned a = 0; a < dev_tmp.size(); a++)
   {
-
     for(int b = 0; b < dev_tmp[a][0]->GetNbinsX(); b++)
     {
       std::vector<TSpline3*> tmp_xbin;
@@ -324,7 +325,7 @@ void XsecVary::WriteGraphs(std::string outputname){
 
   int rwbin = 0;
 
-  std::string modeToName[] = {"ccqe","cc1pi","cccoh","ccmisc","ncpiz","ncpipm","nccoh","ncoth","mec", "nc1gamma", "ccmpi", "ccdis"};//ETA adding ccmpi and ccdis for the 2020OA
+  std::string modeToName[] = {"ccqe","ccqe","cccoh","ccmisc","ncpiz","ncpipm","nccoh","ncoth","mec", "nc1gamma", "ccmpi", "ccdis"};//ETA adding ccmpi and ccdis for the 2020OA
   for(unsigned a = 0; a < systematicProperties.size(); a++)
   {
     for(unsigned b = 0; b < systematicProperties[a].intModes.size(); b++)

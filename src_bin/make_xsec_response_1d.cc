@@ -34,8 +34,10 @@ using std::endl;
 bool nue = false;
 bool NHC = true;
 bool byEvent_splines = false;
-std::string fTempFilenue =  "inputs/sk_nuepi0_templates_v0.root";
+std::string fTempFilenue =  "inputs/DUNE_numu_templates_v0.root";
 std::string fTempFilenumu =  "inputs/DUNE_numu_templates_v0.root";
+std::string fTempFilenue_erec =  "inputs/DUNE_numu_templates_v0_erec.root";
+std::string fTempFilenumu_erec =  "inputs/DUNE_numu_templates_v0_erec.root";
 std::string fCovFile = "inputs/flux_covariance_13av1_prelim.root";
 std::string wtfile = "";
 std::string mtuple = "";
@@ -86,24 +88,36 @@ int main(int argc, char *argv[])
     if (nue) std::cout << "Using nue selection" << std::endl;
     else std::cout << "Using numu selection" << std::endl;
 
-
-
+    //Change File paths
+    outfile = "../m3_dune/inputs/mtuples/MAQESplines/" + outfile;
+    std::cout << "THE OUTPUT FILE IS: " << outfile << std::endl; 
     //Open template files and covariance files
     TFile *ftemp_nue = new TFile(fTempFilenue.c_str()); 
     TFile *ftemp_numu = new TFile(fTempFilenumu.c_str());
-
+    
+    TFile *ftemp_nue_erec = new TFile(fTempFilenue_erec.c_str()); 
+    TFile *ftemp_numu_erec = new TFile(fTempFilenumu_erec.c_str());
 
     //Load the templates
     std::vector<TH1F*> recoe_temps;
+    std::vector<TH1F*> recoe_temps_erec;
     if (nue)
       ReadTemplates(ftemp_nue, recoe_temps);
     else
       ReadTemplates(ftemp_numu, recoe_temps);
     std::cout << "Creating splines with ";
+    if (nue) std::cout << "nue etrue binning" << std::endl;
+    else std::cout << "numu etrue binning" << std::endl;
+    std::cout << "Found " << recoe_temps.size() << " etrue binning templates" << std::endl;
+
+    if (nue)
+      ReadTemplates(ftemp_nue_erec, recoe_temps_erec);
+    else
+      ReadTemplates(ftemp_numu_erec, recoe_temps_erec);
+    std::cout << "Creating splines with ";
     if (nue) std::cout << "nue erec binning" << std::endl;
     else std::cout << "numu erec binning" << std::endl;
-    std::cout << "Found " << recoe_temps.size() << " erec binning templates" << std::endl;
-
+    std::cout << "Found " << recoe_temps_erec.size() << " erec binning templates" << std::endl;
 
     //Load the xsec variations, generate splines and graphs for xsec variations
 
@@ -121,12 +135,11 @@ int main(int argc, char *argv[])
 
     // Vectors containing interaction mode codes that will eventually be associated with a
     // particular systematic. These are the modes this systematic affects.
-    std::vector<int> ccqemode; ccqemode.push_back(1);
-    std::vector<int> mecmode; mecmode.push_back(8);
-    std::vector<int> pimodes; pimodes.push_back(1); pimodes.push_back(4); pimodes.push_back(5);
-    std::vector<int> ccothmode; ccothmode.push_back(3);
-	std::vector<int> ccmpimode; ccmpimode.push_back(10); //ETA adding dis and mpi modes for 2020OA
-	std::vector<int> ccdismode; ccdismode.push_back(11);
+    std::vector<int> ccqemodes; ccqemodes.push_back(1);
+    std::vector<int> resmodes; resmodes.push_back(4);
+    std::vector<int> dismodes; dismodes.push_back(3);
+    std::vector<int> disresmodes; disresmodes.push_back(3); disresmodes.push_back(4);
+    std::vector<int> mostmodes; mostmodes.push_back(1); mostmodes.push_back(3); mostmodes.push_back(4); mostmodes.push_back(10);
     std::vector<int> allmodes; 
     for(int i = 0; i <= 11; i++) 
       allmodes.push_back(i);
@@ -143,7 +156,7 @@ int main(int argc, char *argv[])
     // (5) [optional] Should extra knots be made to extend the range of systematic
     //      values in the splines, creating flat(ish) edges? (boolean)
 	//
-	//    SystematicProperties pfo_sysprop("NIWG2014a_pF_O16","pfo",ccqemode,6,true);
+	///    SystematicProperties pfo_sysprop("NIWG2014a_pF_O16","pfo",ccqemode,6,true);
     //    SystematicProperties maqe_sf_sysprop("NXSec_MaCCQE_SF","maqesf",ccqemode,14);
 	//    SystematicProperties dismpishp_sysprop("NIWG2012a_dismpishp","dismpishp",ccothmode,6);
 	//    SystematicProperties berpaA_sysprop("NIWG_Effective_rpaCCQE_A","erpa_A",ccqemode,6);
@@ -153,75 +166,75 @@ int main(int argc, char *argv[])
    
    // DUNE SYSTEMATICS
  
-    SystematicProperties maqe_sysprop("MaCCQE","maqe",ccqemode,3);  //1
-    SystematicProperties vecffqeshape_sysprop("VecFFCCQEshape","vecffqeshape", allmodes,3); //1,3,4?
-    SystematicProperties mancel_sysprop("MaNCEL","mancel", allmodes,3); //1,3,4?
-    SystematicProperties etancel_sysprop("EtaNCEL","etancel", allmodes,3);
-    SystematicProperties mares_sysprop("MaCCRES","mares", allmodes,3);
-    SystematicProperties mvres_sysprop("MvCCRES","mvres", allmodes,3);
-    SystematicProperties mancres_sysprop("MaNCRES","mancres", allmodes,3);
-    SystematicProperties mvncres_sysprop("MvNCRES","mvncres", allmodes,3);
-    SystematicProperties rdecbr1gamma_sysprop("RDecBR1gamma", "rdecbr1gamma", allmodes,3);
-    SystematicProperties rdecbr1eta_sysprop("RDecBR1eta", "rdecbr1eta", allmodes,3);
-    SystematicProperties thetadelta_sysprop("Theta_Delta2Npi", "thetadelta", allmodes,3);
-    SystematicProperties ahtby_sysprop("AhtBY", "ahtby", allmodes,3);
-    SystematicProperties bhtby_sysprop("BhtBY", "bhtby", allmodes,3);
-    SystematicProperties cv1uby_sysprop("CV1uBY", "cv1uby", allmodes,3);
-    SystematicProperties cv2uby_sysprop("CV2uBY", "cv2uby", allmodes,3);
-    SystematicProperties formzone_sysprop("FormZone", "formzone", allmodes,3);
-    SystematicProperties mfppi_sysprop("MFP_pi", "mfppi", allmodes,3);
-    SystematicProperties frcexpi_sysprop("FrCEx_pi", "frcexpi", allmodes,3);
-    SystematicProperties frelaspi_sysprop("FrElas_pi", "frelaspi", allmodes,3);
-    SystematicProperties frinelpi_sysprop("FrInel_pi", "frinelpi", allmodes,3);
-    SystematicProperties frabspi_sysprop("FrAbs_pi", "frabspi", allmodes,3);
-    SystematicProperties frpiprodpi_sysprop("FrPiProd_pi", "frpiprodpi", allmodes,3);
-    SystematicProperties mfpn_sysprop("MFP_N", "mfpn", allmodes,3);
-    SystematicProperties frcexn_sysprop("FrCEx_N", "frcexn", allmodes,3);
-    SystematicProperties frelasn_sysprop("FrElas_N", "frelasn", allmodes,3);
-    SystematicProperties frineln_sysprop("FrInel_N", "frineln", allmodes,3);
-    SystematicProperties frabsn_sysprop("FrAbs_N", "frabsn", allmodes,3);
-    SystematicProperties frpiprodn_sysprop("FrPiProd_N", "frpiprodn", allmodes,3);
-    SystematicProperties pauli_sysprop("CCQEPauliSupViaKF", "pauli", allmodes,3);
-    SystematicProperties gauss_sysprop("Mnv2p2hGaussEnhancement", "gauss", allmodes,3);
-    SystematicProperties mkspp_sysprop("MKSPP_ReWeight", "mkspp", allmodes,3);
-    SystematicProperties e2anu_sysprop("E2p2h_A_nu", "e2anu", allmodes,3);
-    SystematicProperties e2bnu_sysprop("E2p2h_B_nu", "e2bnu", allmodes,3);
-    SystematicProperties e2anubar_sysprop("E2p2h_A_nubar", "e2anubar", allmodes,3);
-    SystematicProperties e2bnubar_sysprop("E2p2h_B_nubar", "e2bnubar", allmodes,3);
-    SystematicProperties nuncc2_sysprop("NR_nu_n_CC_2Pi", "nuncc2", allmodes,3);
-    SystematicProperties nuncc3_sysprop("NR_nu_n_CC_3Pi", "nuncc3", allmodes,3);
-    SystematicProperties nupcc2_sysprop("NR_nu_p_CC_2Pi", "nupcc2", allmodes,3);
-    SystematicProperties nupcc3_sysprop("NR_nu_p_CC_3Pi", "nupcc3", allmodes,3);
-    SystematicProperties nunpcc1_sysprop("NR_nu_np_CC_1Pi", "nunpcc1", allmodes,3);
-    SystematicProperties nunnc1_sysprop("NR_nu_n_NC_1Pi", "nunnc1", allmodes,3);
-    SystematicProperties nunnc2_sysprop("NR_nu_n_NC_2Pi", "nunnc2", allmodes,3);
-    SystematicProperties nunnc3_sysprop("NR_nu_n_NC_3Pi", "nunnc3", allmodes,3);
-    SystematicProperties nupnc1_sysprop("NR_nu_p_NC_1Pi", "nupnc1", allmodes,3);
-    SystematicProperties nupnc2_sysprop("NR_nu_p_NC_2Pi", "nupnc2", allmodes,3);
-    SystematicProperties nupnc3_sysprop("NR_nu_p_NC_3Pi", "nupnc3", allmodes,3);
-    SystematicProperties nubarncc1_sysprop("NR_nubar_n_CC_1Pi", "nubarncc1", allmodes,3);
-    SystematicProperties nubarncc2_sysprop("NR_nubar_n_CC_2Pi", "nubarncc2", allmodes,3);
-    SystematicProperties nubarncc3_sysprop("NR_nubar_n_CC_3Pi", "nubarncc3", allmodes,3);
-    SystematicProperties nubarpcc1_sysprop("NR_nubar_p_CC_1Pi", "nubarpcc1", allmodes,3);
-    SystematicProperties nubarpcc2_sysprop("NR_nubar_p_CC_2Pi", "nubarpcc2", allmodes,3);
-    SystematicProperties nubarpcc3_sysprop("NR_nubar_p_CC_3Pi", "nubarpcc3", allmodes,3);
-    SystematicProperties nubarnnc1_sysprop("NR_nubar_n_NC_1Pi", "nubarnnc1", allmodes,3);
-    SystematicProperties nubarnnc2_sysprop("NR_nubar_n_NC_2Pi", "nubarnnc2", allmodes,3);
-    SystematicProperties nubarnnc3_sysprop("NR_nubar_n_NC_3Pi", "nubarnnc3", allmodes,3);
-    SystematicProperties nubarpnc1_sysprop("NR_nubar_p_NC_1Pi", "nubarpnc1", allmodes,3);
-    SystematicProperties nubarpnc2_sysprop("NR_nubar_p_NC_2Pi", "nubarpnc2", allmodes,3);
-    SystematicProperties nubarpnc3_sysprop("NR_nubar_p_NC_3Pi", "nubarpnc3", allmodes,3);
-    SystematicProperties berpaa_sysprop("BeRPA_A", "berpaa", allmodes,3);
-    SystematicProperties berpab_sysprop("BeRPA_B", "berpab", allmodes,3);
-    SystematicProperties berpad_sysprop("BeRPA_D", "berpad", allmodes,3);
-    SystematicProperties berpae_sysprop("BeRPA_E", "berpae", allmodes,3);
-    SystematicProperties lepmom_sysprop("EbFSLepMomShift", "lepmom", allmodes,3);
-    SystematicProperties c12nu_sysprop("C12ToAr40_2p2hScaling_nu", "c12nu", allmodes,3);
-    SystematicProperties c12nubar_sysprop("C12ToAr40_2p2hScaling_nubar", "c12nubar", allmodes,3);
-    SystematicProperties nuexsec_sysprop("nuenuebar_xsec_ratio", "nuexsec", allmodes,3);
-    SystematicProperties nuemuxsec_sysprop("nuenumubar_xsec_ratio", "nuemuxsec", allmodes,3);
-    SystematicProperties q2sup_sysprop("SPPLowQ2Suppression", "q2sup", allmodes,3);
-    SystematicProperties fsismear_sysprop("FSILikeEAvailSmearing", "fsismear", allmodes,3);
+    SystematicProperties maqe_sysprop("MaCCQE","maqe",ccqemodes,3);  //1
+    SystematicProperties vecffqeshape_sysprop("VecFFCCQEshape","vecffqeshape", ccqemodes,3); //1
+    //SystematicProperties mancel_sysprop("MaNCEL","mancel", allmodes,3); //? **
+    //SystematicProperties etancel_sysprop("EtaNCEL","etancel", allmodes,3);//? **
+    SystematicProperties mares_sysprop("MaCCRES","mares", resmodes,3);//4
+    SystematicProperties mvres_sysprop("MvCCRES","mvres", resmodes,3);//4
+    SystematicProperties mancres_sysprop("MaNCRES","mancres", resmodes,3);//4
+    SystematicProperties mvncres_sysprop("MvNCRES","mvncres", resmodes,3);//4
+    //SystematicProperties rdecbr1gamma_sysprop("RDecBR1gamma", "rdecbr1gamma", resmodes,3);//4 **
+    //SystematicProperties rdecbr1eta_sysprop("RDecBR1eta", "rdecbr1eta", resmodes,3);//4 **
+    SystematicProperties thetadelta_sysprop("Theta_Delta2Npi", "thetadelta", resmodes,3); //4
+    SystematicProperties ahtby_sysprop("AhtBY", "ahtby", dismodes,3); //3
+    SystematicProperties bhtby_sysprop("BhtBY", "bhtby", dismodes,3); //3
+    SystematicProperties cv1uby_sysprop("CV1uBY", "cv1uby", dismodes,3); //3
+    SystematicProperties cv2uby_sysprop("CV2uBY", "cv2uby", dismodes,3); //3
+    //SystematicProperties formzone_sysprop("FormZone", "formzone", dismodes,3); //3 **
+    //SystematicProperties mfppi_sysprop("MFP_pi", "mfppi", dismodes,3);//3 **
+    SystematicProperties frcexpi_sysprop("FrCEx_pi", "frcexpi", disresmodes,3);//3,4
+    SystematicProperties frelaspi_sysprop("FrElas_pi", "frelaspi", disresmodes,3);//3,4
+    SystematicProperties frinelpi_sysprop("FrInel_pi", "frinelpi", disresmodes,3);//3,4
+    SystematicProperties frabspi_sysprop("FrAbs_pi", "frabspi", disresmodes,3);//3,4
+    SystematicProperties frpiprodpi_sysprop("FrPiProd_pi", "frpiprodpi", disresmodes,3);//3,4
+    //SystematicProperties mfpn_sysprop("MFP_N", "mfpn", mostmodes,3);//1,3,4,10 **
+    SystematicProperties frcexn_sysprop("FrCEx_N", "frcexn", mostmodes,3);//1,3,4,10
+    SystematicProperties frelasn_sysprop("FrElas_N", "frelasn", mostmodes,3);//1,3,4,10
+    SystematicProperties frineln_sysprop("FrInel_N", "frineln", mostmodes,3);//1,3,4,10
+    SystematicProperties frabsn_sysprop("FrAbs_N", "frabsn", mostmodes,3);//1,3,4,10
+    SystematicProperties frpiprodn_sysprop("FrPiProd_N", "frpiprodn", mostmodes,3);//1,3,4,10
+    SystematicProperties pauli_sysprop("CCQEPauliSupViaKF", "pauli", ccqemodes,3);//1
+    //SystematicProperties gauss_sysprop("Mnv2p2hGaussEnhancement", "gauss", allmodes,3);//1,3,4,5,10 *
+    //SystematicProperties mkspp_sysprop("MKSPP_ReWeight", "mkspp", allmodes,3);//1,3,4,5,10**
+    SystematicProperties e2anu_sysprop("E2p2h_A_nu", "e2anu", allmodes,3);//1,3,4,5,7,10 
+    SystematicProperties e2bnu_sysprop("E2p2h_B_nu", "e2bnu", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties e2anubar_sysprop("E2p2h_A_nubar", "e2anubar", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties e2bnubar_sysprop("E2p2h_B_nubar", "e2bnubar", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nuncc2_sysprop("NR_nu_n_CC_2Pi", "nuncc2", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nuncc3_sysprop("NR_nu_n_CC_3Pi", "nuncc3", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nupcc2_sysprop("NR_nu_p_CC_2Pi", "nupcc2", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nupcc3_sysprop("NR_nu_p_CC_3Pi", "nupcc3", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nunpcc1_sysprop("NR_nu_np_CC_1Pi", "nunpcc1", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nunnc1_sysprop("NR_nu_n_NC_1Pi", "nunnc1", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nunnc2_sysprop("NR_nu_n_NC_2Pi", "nunnc2", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nunnc3_sysprop("NR_nu_n_NC_3Pi", "nunnc3", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nupnc1_sysprop("NR_nu_p_NC_1Pi", "nupnc1", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nupnc2_sysprop("NR_nu_p_NC_2Pi", "nupnc2", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nupnc3_sysprop("NR_nu_p_NC_3Pi", "nupnc3", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarncc1_sysprop("NR_nubar_n_CC_1Pi", "nubarncc1", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarncc2_sysprop("NR_nubar_n_CC_2Pi", "nubarncc2", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarncc3_sysprop("NR_nubar_n_CC_3Pi", "nubarncc3", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarpcc1_sysprop("NR_nubar_p_CC_1Pi", "nubarpcc1", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarpcc2_sysprop("NR_nubar_p_CC_2Pi", "nubarpcc2", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarpcc3_sysprop("NR_nubar_p_CC_3Pi", "nubarpcc3", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarnnc1_sysprop("NR_nubar_n_NC_1Pi", "nubarnnc1", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarnnc2_sysprop("NR_nubar_n_NC_2Pi", "nubarnnc2", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarnnc3_sysprop("NR_nubar_n_NC_3Pi", "nubarnnc3", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarpnc1_sysprop("NR_nubar_p_NC_1Pi", "nubarpnc1", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarpnc2_sysprop("NR_nubar_p_NC_2Pi", "nubarpnc2", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nubarpnc3_sysprop("NR_nubar_p_NC_3Pi", "nubarpnc3", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties berpaa_sysprop("BeRPA_A", "berpaa", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties berpab_sysprop("BeRPA_B", "berpab", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties berpad_sysprop("BeRPA_D", "berpad", allmodes,3);//1,3,4,5,7,10
+    //SystematicProperties berpae_sysprop("BeRPA_E", "berpae", allmodes,3);//1,3,4,5,7,10 **
+    //SystematicProperties lepmom_sysprop("EbFSLepMomShift", "lepmom", allmodes,3);//1,3,4,5,7,10 **
+    SystematicProperties c12nu_sysprop("C12ToAr40_2p2hScaling_nu", "c12nu", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties c12nubar_sysprop("C12ToAr40_2p2hScaling_nubar", "c12nubar", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nuexsec_sysprop("nuenuebar_xsec_ratio", "nuexsec", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties nuemuxsec_sysprop("nuenumu_xsec_ratio", "nuemuxsec", allmodes,3);//1,3,4,5,7,10
+    //SystematicProperties q2sup_sysprop("SPPLowQ2Suppression", "q2sup", allmodes,3);//1,3,4,5,10 **
+    //SystematicProperties fsismear_sysprop("FSILikeEAvailSmearing", "fsismear", allmodes,3);//1,3,4,5,7,10 **
 
     //SystematicProperties mec_sysprop("NIWGMEC_PDDWeight_O16","mecpdd",mecmode,3);
     //SystematicProperties ca5_sysprop("NXSec_CA5RES","ca5",pimodes,3);
@@ -259,45 +272,76 @@ int main(int argc, char *argv[])
 	//SystematicProperties LowQ2Suppression_8_sysprop("NIWGQETwk_LowQ2Suppression8", "LowQ2Suppression7", ccqemode, 3);
 
     // Put these systematics in a list
-    std::vector<SystematicProperties> systProps;
-    systProps.push_back(etancel_sysprop);
-    //systProps.push_back(maqe_sf_sysprop);
-    //systProps.push_back(mec_sysprop);
-	//    systProps.push_back(pfo_sysprop);
-    //systProps.push_back(ca5_sysprop);
-    //systProps.push_back(manff_sysprop);
-    //systProps.push_back(bgscl_sysprop);
-	//    systProps.push_back(dismpishp_sysprop);
-	//    systProps.push_back(berpaA_sysprop);
-	//    systProps.push_back(berpaB_sysprop);
-	//    systProps.push_back(berpaC_sysprop);
-	//    systProps.push_back(berpaD_sysprop);
-    //systProps.push_back(FSI_NCasc_FrAbs_pi_sysprop);
-    //systProps.push_back(FSI_NCasc_FrCExLow_pi_sysprop);
-    //systProps.push_back(FSI_NCasc_FrCExHigh_pi_sysprop);//ETA- NOT USUALLY IN THE OA
-    //systProps.push_back(FSI_NCasc_FrInelLow_pi_sysprop);
-    //systProps.push_back(FSI_NCasc_FrPiProd_pi_sysprop);
-    //systProps.push_back(FSI_NCasc_FrInelHigh_pi_sysprop);
-	//ETA CCDIS and CCMPi parameters for 2020OA
-    //systProps.push_back(BY_DIS_sysprop);
-    //systProps.push_back(BY_MPi_sysprop);
-    //systProps.push_back(Xsec_AGKY_sysprop);
-	//ETA I-1/2 anti-nu parameter
-	//systProps.push_back(bgsclbar_sysprop);
-	//ETA 2p2h energy dependent parameters
-	//systProps.push_back(Edep2p2h_lowEnu_sysprop);
-	//systProps.push_back(Edep2p2h_highEnu_sysprop);
-	//systProps.push_back(Edep2p2h_lowEnubar_sysprop);
-	//systProps.push_back(Edep2p2h_highEnubar_sysprop);
-	//Q2 parameters
-	//systProps.push_back(LowQ2Suppression_1_sysprop);
-	//systProps.push_back(LowQ2Suppression_2_sysprop);
-	//systProps.push_back(LowQ2Suppression_3_sysprop);
-	//systProps.push_back(LowQ2Suppression_4_sysprop);
-	//systProps.push_back(LowQ2Suppression_5_sysprop);
-	//systProps.push_back(LowQ2Suppression_6_sysprop);
-	//systProps.push_back(LowQ2Suppression_7_sysprop);
-	//systProps.push_back(LowQ2Suppression_8_sysprop);
+    std::vector<SystematicProperties> systProps;   
+    systProps.push_back(maqe_sysprop);
+    systProps.push_back(vecffqeshape_sysprop);
+    //systProps.push_back(mancel_sysprop);
+    //systProps.push_back(etancel_sysprop);
+    systProps.push_back(mares_sysprop);
+    systProps.push_back(mvres_sysprop);
+    systProps.push_back(mancres_sysprop);
+    systProps.push_back(mvncres_sysprop);
+    //systProps.push_back(rdecbr1gamma_sysprop);
+    //systProps.push_back(rdecbr1eta_sysprop);
+    systProps.push_back(thetadelta_sysprop);
+    systProps.push_back(ahtby_sysprop);
+    systProps.push_back(bhtby_sysprop);
+    systProps.push_back(cv1uby_sysprop);
+    systProps.push_back(cv2uby_sysprop);
+    //systProps.push_back(formzone_sysprop);
+    //systProps.push_back(mfppi_sysprop);
+    systProps.push_back(frcexpi_sysprop);
+    systProps.push_back(frelaspi_sysprop);
+    systProps.push_back(frinelpi_sysprop);
+    systProps.push_back(frabspi_sysprop);
+    systProps.push_back(frpiprodpi_sysprop);
+    //systProps.push_back(mfpn_sysprop);
+    systProps.push_back(frcexn_sysprop);
+    systProps.push_back(frelasn_sysprop);
+    systProps.push_back(frineln_sysprop);
+    systProps.push_back(frabsn_sysprop);
+    systProps.push_back(frpiprodn_sysprop);
+    systProps.push_back(pauli_sysprop);
+    //systProps.push_back(gauss_sysprop);
+    //systProps.push_back(mkspp_sysprop);
+    systProps.push_back(e2anu_sysprop);
+    systProps.push_back(e2bnu_sysprop);
+    systProps.push_back(e2anubar_sysprop);
+    systProps.push_back(e2bnubar_sysprop);
+    systProps.push_back(nuncc2_sysprop);
+    systProps.push_back(nuncc3_sysprop);
+    systProps.push_back(nupcc2_sysprop);
+    systProps.push_back(nupcc3_sysprop);
+    systProps.push_back(nunpcc1_sysprop);
+    systProps.push_back(nunnc1_sysprop);
+    systProps.push_back(nunnc2_sysprop);
+    systProps.push_back(nunnc3_sysprop);
+    systProps.push_back(nupnc1_sysprop);
+    systProps.push_back(nupnc2_sysprop);
+    systProps.push_back(nupnc3_sysprop);
+    systProps.push_back(nubarncc1_sysprop);
+    systProps.push_back(nubarncc2_sysprop);
+    systProps.push_back(nubarncc3_sysprop);
+    systProps.push_back(nubarpcc1_sysprop);
+    systProps.push_back(nubarpcc2_sysprop);
+    systProps.push_back(nubarpcc3_sysprop);
+    systProps.push_back(nubarnnc1_sysprop);
+    systProps.push_back(nubarnnc2_sysprop);
+    systProps.push_back(nubarnnc3_sysprop);
+    systProps.push_back(nubarpnc1_sysprop);
+    systProps.push_back(nubarpnc2_sysprop);
+    systProps.push_back(nubarpnc3_sysprop);
+    systProps.push_back(berpaa_sysprop);
+    systProps.push_back(berpab_sysprop);
+    systProps.push_back(berpad_sysprop);
+    //systProps.push_back(berpae_sysprop);
+    //systProps.push_back(lepmom_sysprop);
+    systProps.push_back(c12nu_sysprop);
+    systProps.push_back(c12nubar_sysprop);
+    systProps.push_back(nuexsec_sysprop);
+    systProps.push_back(nuemuxsec_sysprop);
+    //systProps.push_back(q2sup_sysprop);
+    //systProps.push_back(fsismear_sysprop);
 
     // Call the XSecVary class constructor
     XsecVary xs(wtfile, mtuple, systProps, nutype);
@@ -325,9 +369,9 @@ int main(int argc, char *argv[])
 	  std::cout << ebinrange[ibin] << ", ";
 	std::cout << ebinrange[ebins] << "}" << std::endl;
 	
-	const int rebins = recoe_temps[0]->GetXaxis()->GetNbins();
-	//const Double_t *rebinrange = recoe_temps[0]->GetXaxis()->GetXbins()->GetArray();
-        const Double_t *rebinrange = recoe_temps[0]->GetXaxis()->GetXbins()->GetArray();
+	const int rebins = recoe_temps_erec[0]->GetXaxis()->GetNbins();
+	//const Double_t *rebinrange = recoe_temps_erec[0]->GetXaxis()->GetXbins()->GetArray();
+        const Double_t *rebinrange = recoe_temps_erec[0]->GetXaxis()->GetXbins()->GetArray();
         std::cout << "Number of reco energy bins: " << rebins << "." << std::endl;
 	std::cout << "Reco energy bins: {";
 	for (int ibin=0; ibin<rebins; ibin++)
@@ -344,9 +388,10 @@ int main(int argc, char *argv[])
 	xs.WriteGraphs(outfile);
         
         //Code to create bin Template
-        //double bins[] = { 0, 0.5, 0.505102, 0.510309, 0.515625, 0.521053, 0.526596, 0.532258, 0.538043, 0.543956, 0.55, 0.55618, 0.5625, 0.568966, 0.575581, 0.582353, 0.589286, 0.596386, 0.603659, 0.611111, 0.61875, 0.626582, 0.634615, 0.642857, 0.651316, 0.66, 0.668919, 0.678082, 0.6875, 0.697183, 0.707143, 0.717391, 0.727941, 0.738806, 0.75, 0.761538, 0.773438, 0.785714, 0.798387, 0.811475, 0.825, 0.838983, 0.853448, 0.868421, 0.883929, 0.9, 0.916667, 0.933962, 0.951923, 0.970588, 0.99, 1.0102, 1.03125, 1.05319, 1.07609, 1.1, 1.125, 1.15116, 1.17857, 1.20732, 1.2375, 1.26923, 1.30263, 1.33784, 1.375, 1.41429, 1.45588, 1.5, 1.54688, 1.59677, 1.65, 1.7069, 1.76786, 1.83333, 1.90385, 1.98, 2.0625, 2.15217, 2.25, 2.35714, 2.475, 2.60526, 2.75, 2.91176, 3.09375, 3.3, 3.53571, 3.80769, 4.125, 4.5, 4.95, 5.5, 6.1875, 7.07143, 8.25, 9.9, 12.375, 16.5, 24.75, 49.5, 120};
+         
+        //double bins[] = {0.,  0.5,  1.,  1.25, 1.5, 1.75, 2.,  2.25, 2.5, 2.75, 3.,  3.25, 3.5, 3.75, 4.,  5.,   6.,  10.};       
 
-        //TH1D * hrecoe_0 = new TH1D("hrecoe_0", "reconstructed E#nu for sample", 100, bins);
+        //TH1D * hrecoe_0 = new TH1D("hrecoe_0", "reconstructed E#nu for sample", 17, bins);
 
 
 
@@ -354,10 +399,12 @@ int main(int argc, char *argv[])
           //cout << i << " : " << hrecoe_0->GetBinLowEdge(i) << "-" << hrecoe_0->GetBinLowEdge(i+1) << endl; 
     //}
 
-        //TFile *fout = new TFile("DUNE_numu_templates_v0.root", "recreate");
+        //TFile *fout = new TFile("DUNE_numu_templates_v0_etrue.root", "recreate");
         //hrecoe_0->Write();
         //fout->Write();
         //fout->Close();
+
+
       }
 /*
     else // Event-by-event splines 

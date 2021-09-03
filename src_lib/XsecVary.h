@@ -259,7 +259,7 @@ XsecVary::XsecVary(std::string weight_file, std::string kinematics_file, std::ve
 
   weightFile = weight_file;
 
-  fChain = new TChain("cafmaker/caf");//h1/mtuple/minituple
+  fChain = new TChain("caf");//h1/mtuple/minituple
   if(fChain)   fChain->Add(kinematics_file.c_str());
   if(fChain->GetEntries()==0)
   {
@@ -476,59 +476,59 @@ void XsecVary::Init()
   fCurrent = -1;
   fChain->SetMakeClass(1);
 
-  fChain->SetBranchAddress("iclass", &iclass, &b_iclass);
-  fChain->SetBranchAddress("Ibound", &Ibound, &b_Ibound);
-  fChain->SetBranchAddress("fqmomm", &fqmomm, &b_fqmomm);
-  fChain->SetBranchAddress("fqmome", &fqmome, &b_fqmome);
-  fChain->SetBranchAddress("fqmrmom", &fqmrmom, &b_fqmrmom);
-  fChain->SetBranchAddress("fqmreloss", &fqmreloss, &b_fqmreloss);
-  fChain->SetBranchAddress("fqmrdir", &fqmrdir, &b_fqmrdir);
-  fChain->SetBranchAddress("fq1rdir", &fq1rdir, &b_fq1rdir);
-  fChain->SetBranchAddress("ipp", &ipp, &b_ipp);
-  fChain->SetBranchAddress("erec", &Erec_check, &b_erec);
-  fChain->SetBranchAddress("pizmass", &pizmass, &b_pizmass);
-  fChain->SetBranchAddress("pizmom", &pizmom, &b_pizmom);
-  fChain->SetBranchAddress("pizcosb", &pizcosb, &b_pizcosb);
-  fChain->SetBranchAddress("wgtflx", &wgtflx, &b_wgtflx);
-  fChain->SetBranchAddress("wgtosc", &wgtosc, &b_wgtosc);
-  fChain->SetBranchAddress("dir", dir, &b_dir);
-  fChain->SetBranchAddress("amome", amome, &b_amome);
-  fChain->SetBranchAddress("npar", &npar, &b_npar);
-  fChain->SetBranchAddress("wallv", &wallv, &b_wallv);
-  fChain->SetBranchAddress("ipv", ipv, &b_ipv);
-  fChain->SetBranchAddress("posv", posv, &b_posv);
-  fChain->SetBranchAddress("dirv", dirv, &b_dirv);
-  fChain->SetBranchAddress("pmomv", pmomv, &b_pmomv);
-  fChain->SetBranchAddress("npar2", &npar2, &b_npar2);
-  fChain->SetBranchAddress("ipv2", ipv2, &b_ipv2);
-  fChain->SetBranchAddress("numnu", &numnu, &b_numnu);
-  fChain->SetBranchAddress("mode", &mode, &b_mode);
-  fChain->SetBranchAddress("nuPDG", ipnu, &b_ipnu);
-  fChain->SetBranchAddress("Ev", pnu, &b_pnu);
-  fChain->SetBranchAddress("dirnu", dirnu, &b_dirnu);
-  fChain->SetBranchAddress("Npvc", &Npvc, &b_Npvc);
-  fChain->SetBranchAddress("Ipvc", Ipvc, &b_Ipvc);
-  fChain->SetBranchAddress("Ichvc", Ichvc, &b_Ichvc);
-  fChain->SetBranchAddress("Iorgvc", Iorgvc, &b_Iorgvc);
-  fChain->SetBranchAddress("Iflvc", Iflvc, &b_Iflvc);
-  fChain->SetBranchAddress("Abspvc", Abspvc, &b_Abspvc);
-  fChain->SetBranchAddress("Pvc", Pvc, &b_Pvc);
-  fChain->SetBranchAddress("Crsx", &Crsx, &b_Crsx);
-  fChain->SetBranchAddress("Crsy", &Crsy, &b_Crsy);
-  fChain->SetBranchAddress("Crsz", &Crsz, &b_Crsz);
-  fChain->SetBranchAddress("Crsphi", &Crsphi, &b_Crsphi);
-  fChain->SetBranchAddress("Nvert", &Nvert, &b_Nvert);
-  fChain->SetBranchAddress("Posvert", Posvert, &b_Posvert);
-  fChain->SetBranchAddress("Iflgvert", Iflgvert, &b_Iflgvert);
-  fChain->SetBranchAddress("Nvcvert", &Nvcvert, &b_Nvcvert);
-  fChain->SetBranchAddress("Dirvert", Dirvert, &b_Dirvert);
-  fChain->SetBranchAddress("Abspvert", Abspvert, &b_Abspvert);
-  fChain->SetBranchAddress("Abstpvert", Abstpvert, &b_Abstpvert);
-  fChain->SetBranchAddress("Ipvert", Ipvert, &b_Ipvert);
-  fChain->SetBranchAddress("Iverti", Iverti, &b_Iverti);
-  fChain->SetBranchAddress("Ivertf", Ivertf, &b_Ivertf);
-  fChain->SetBranchAddress("Fsiprob", &Fsiprob, &b_Fsiprob);
-  fChain->SetBranchAddress("posc", posc, &b_posc);
+  //fChain->SetBranchAddress("iclass", &iclass, &b_iclass);
+  //fChain->SetBranchAddress("Ibound", &Ibound, &b_Ibound);
+  //fChain->SetBranchAddress("fqmomm", &fqmomm, &b_fqmomm);
+  //fChain->SetBranchAddress("fqmome", &fqmome, &b_fqmome);
+  //fChain->SetBranchAddress("fqmrmom", &fqmrmom, &b_fqmrmom);
+  //fChain->SetBranchAddress("fqmreloss", &fqmreloss, &b_fqmreloss);
+  //fChain->SetBranchAddress("fqmrdir", &fqmrdir, &b_fqmrdir);
+  //fChain->SetBranchAddress("fq1rdir", &fq1rdir, &b_fq1rdir);
+  //fChain->SetBranchAddress("ipp", &ipp, &b_ipp);
+  //fChain->SetBranchAddress("erec", &Erec_check, &b_erec);
+  //fChain->SetBranchAddress("pizmass", &pizmass, &b_pizmass);
+  //fChain->SetBranchAddress("pizmom", &pizmom, &b_pizmom);
+  //fChain->SetBranchAddress("pizcosb", &pizcosb, &b_pizcosb);
+  //fChain->SetBranchAddress("wgtflx", &wgtflx, &b_wgtflx);
+  //fChain->SetBranchAddress("wgtosc", &wgtosc, &b_wgtosc);
+  //fChain->SetBranchAddress("dir", dir, &b_dir);
+  //fChain->SetBranchAddress("amome", amome, &b_amome);
+  //fChain->SetBranchAddress("npar", &npar, &b_npar);
+  //fChain->SetBranchAddress("wallv", &wallv, &b_wallv);
+  //fChain->SetBranchAddress("ipv", ipv, &b_ipv);
+  //fChain->SetBranchAddress("posv", posv, &b_posv);
+  //fChain->SetBranchAddress("dirv", dirv, &b_dirv);
+  //fChain->SetBranchAddress("pmomv", pmomv, &b_pmomv);
+  //fChain->SetBranchAddress("npar2", &npar2, &b_npar2);
+  //fChain->SetBranchAddress("ipv2", ipv2, &b_ipv2);
+  //fChain->SetBranchAddress("numnu", &numnu, &b_numnu);
+  //fChain->SetBranchAddress("mode", &mode, &b_mode);
+  //fChain->SetBranchAddress("nuPDG", ipnu, &b_ipnu);
+  //fChain->SetBranchAddress("Ev", pnu, &b_pnu);
+  //fChain->SetBranchAddress("dirnu", dirnu, &b_dirnu);
+  //fChain->SetBranchAddress("Npvc", &Npvc, &b_Npvc);
+  //fChain->SetBranchAddress("Ipvc", Ipvc, &b_Ipvc);
+  //fChain->SetBranchAddress("Ichvc", Ichvc, &b_Ichvc);
+  //fChain->SetBranchAddress("Iorgvc", Iorgvc, &b_Iorgvc);
+  //fChain->SetBranchAddress("Iflvc", Iflvc, &b_Iflvc);
+  //fChain->SetBranchAddress("Abspvc", Abspvc, &b_Abspvc);
+  //fChain->SetBranchAddress("Pvc", Pvc, &b_Pvc);
+  //fChain->SetBranchAddress("Crsx", &Crsx, &b_Crsx);
+  //fChain->SetBranchAddress("Crsy", &Crsy, &b_Crsy);
+  //fChain->SetBranchAddress("Crsz", &Crsz, &b_Crsz);
+  //fChain->SetBranchAddress("Crsphi", &Crsphi, &b_Crsphi);
+  //fChain->SetBranchAddress("Nvert", &Nvert, &b_Nvert);
+  //fChain->SetBranchAddress("Posvert", Posvert, &b_Posvert);
+  //fChain->SetBranchAddress("Iflgvert", Iflgvert, &b_Iflgvert);
+  //fChain->SetBranchAddress("Nvcvert", &Nvcvert, &b_Nvcvert);
+  //fChain->SetBranchAddress("Dirvert", Dirvert, &b_Dirvert);
+  //fChain->SetBranchAddress("Abspvert", Abspvert, &b_Abspvert);
+  //fChain->SetBranchAddress("Abstpvert", Abstpvert, &b_Abstpvert);
+  //fChain->SetBranchAddress("Ipvert", Ipvert, &b_Ipvert);
+  //fChain->SetBranchAddress("Iverti", Iverti, &b_Iverti);
+  //fChain->SetBranchAddress("Ivertf", Ivertf, &b_Ivertf);
+  //fChain->SetBranchAddress("Fsiprob", &Fsiprob, &b_Fsiprob);
+  //fChain->SetBranchAddress("posc", posc, &b_posc);
   /* fChain->SetBranchAddress("EventType", &EventType, &b_EventType); */
   /* fChain->SetBranchAddress("FlxWeight", &FlxWeight, &b_FlxWeight); */
   /* fChain->SetBranchAddress("OscWeight", &OscWeight, &b_OscWeight); */
@@ -539,6 +539,10 @@ void XsecVary::Init()
   fChain->SetBranchAddress("cvnnue", &cvnnue);
   fChain->SetBranchAddress("Ev_reco_numu", &erec_numu);
   fChain->SetBranchAddress("Ev_reco_nue", &erec_nue);
+  fChain->SetBranchAddress("nuPDG", ipnu, &b_ipnu);
+  fChain->SetBranchAddress("Ev", pnu, &b_pnu);
+  fChain->SetBranchAddress("mode", &mode, &b_mode);
+  fChain->SetBranchAddress("wgtosc", &wgtosc);
   Notify();
 }
 
