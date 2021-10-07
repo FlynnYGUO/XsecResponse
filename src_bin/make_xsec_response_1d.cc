@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     else std::cout << "Using numu selection" << std::endl;
 
     //Change File paths
-    outfile = "../m3_dune/inputs/mtuples/MAQESplines/" + outfile;
+    outfile = "../m3_dune/inputs/mtuples/AllSplines/" + outfile;
     std::cout << "THE OUTPUT FILE IS: " << outfile << std::endl; 
     //Open template files and covariance files
     TFile *ftemp_nue = new TFile(fTempFilenue.c_str()); 
