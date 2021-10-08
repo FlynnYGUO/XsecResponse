@@ -427,16 +427,18 @@ void XsecVary::AddSystematics(std::vector<SystematicProperties> &systProps)
   dev_tmp.resize(numSplines);
   fChain->GetEntry(0);
   unsigned int itty = 0;
-  std::string modeToName[] = {"ccqe","cc1pi","cccoh","ccmisc","ncpiz","ncpipm","nccoh","ncoth","mec", "nc1gamma", "ccmpi", "ccdis"};//ETA adding ccmpi and ccdis for 2020OA, ccoth now ccmisc also was nc1gamma missing??
+  //std::string modeToName[] = {"ccqe","cc1pi","cccoh","ccmisc","ncpiz","ncpipm","nccoh","ncoth","mec", "nc1gamma", "ccmpi", "ccdis"};//ETA adding ccmpi and ccdis for 2020OA, ccoth now ccmisc also was nc1gamma missing??
+  std::string modeToName[] = {"qe", "mec", "dis", "res", "coh", "diff", "nueel", "unknown", "amnugamma", "unknown", "cohel", "ibd", "glasres", "imdannihilation"};
+
   for(int k = 0; k < numSysts; k++)
   {
     for(unsigned l = 0; l < systProps[k].intModes.size(); l++)
     {
-      std::cout << systProps[k].weightArray << std::endl;
+      //std::cout << systProps[k].weightArray << std::endl;
       dev_tmp[itty].resize(systProps[k].GetKnotArray()->GetSize());
       itty++;
       char tmpname[1000];
-      sprintf(tmpname,"dev_%s_%s",systProps[k].shortName.c_str(),modeToName[systProps[k].intModes[l]].c_str());
+      sprintf(tmpname,"dev_%s_%s",systProps[k].shortName.c_str(),modeToName[systProps[k].intModes[l]-1].c_str());
       dev_tmp_names.push_back(std::string(tmpname));
     }
   }

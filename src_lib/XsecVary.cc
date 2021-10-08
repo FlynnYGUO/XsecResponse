@@ -83,7 +83,7 @@ void XsecVary::MakeVariations()
     if(abs(mode)==11) modee = 6; //Diffractive
     if(abs(mode)==5) modee = 7; //Electron scattering
     if(abs(mode)==9) modee = 9; //AMnuGamma
-    if(abs(mode)==10) modee = 10; //MEC
+    if(abs(mode)==10) modee = 2; //MEC
     if(abs(mode)==4) modee = 11; //COH Elastic
     if(abs(mode)==7) modee = 12; // IBD
     if(abs(mode)==8)modee = 13; //Glashow RES
@@ -129,6 +129,7 @@ void XsecVary::MakeVariations()
 	    if(TMath::IsNaN(www) || www < 0){
 		  std::cout << "Sys: "<<  systematicProperties[i].shortName.c_str() <<  "  weight " << www << ", wgtflux " << wgtflx << ", wgtosc " << wgtosc << ", xsec_weight " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[0]: " << pnu[0] << ", Erec: " << erec << ", mode: " << mode << std::endl;
 	    }
+		 //if(systematicProperties[i].GetWeightArray()->At(j)> 1.0 || systematicProperties[i].GetWeightArray()->At(j)< 1.0 ){std::cout << "mode is " << modee << " and weight is " << systematicProperties[i].GetWeightArray()->At(j) << std::endl;}
           }
         }
       }
@@ -206,7 +207,7 @@ void XsecVary::MakeVariations()
 
           }
         }
-        if (a == 0) {std::cout << "Total bins with stuff " << counter << std::endl;}
+        //if (a == 0) {std::cout << "Total bins with stuff " << counter << std::endl;}
         iter++;
       }
 
@@ -325,7 +326,9 @@ void XsecVary::WriteGraphs(std::string outputname){
 
   int rwbin = 0;
 
-  std::string modeToName[] = {"ccqe","ccqe","cccoh","ccmisc","ncpiz","ncpipm","nccoh","ncoth","mec", "nc1gamma", "ccmpi", "ccdis"};//ETA adding ccmpi and ccdis for the 2020OA
+  //std::string modeToName[] = {"ccqe","ccqe","cccoh","ccmisc","ncpiz","ncpipm","nccoh","ncoth","mec", "nc1gamma", "ccmpi", "ccdis"};//ETA adding ccmpi and ccdis for the 2020OA
+	std::string modeToName[] = {"qe", "mec", "dis", "res", "coh", "diff", "nueel", "unknown", "amnugamma", "unknown", "cohel", "ibd", "glasres", "imdannihilation"};
+
   for(unsigned a = 0; a < systematicProperties.size(); a++)
   {
     for(unsigned b = 0; b < systematicProperties[a].intModes.size(); b++)
@@ -334,9 +337,11 @@ void XsecVary::WriteGraphs(std::string outputname){
       {
         for(unsigned j = 0; j < (unsigned)graphs[rwbin+b][i].size(); j++)
         {
-          char grname[50];
-          sprintf(grname,"dev_%s_%s_gr_%d_%d",systematicProperties[a].shortName.c_str(),modeToName[systematicProperties[a].intModes[b]].c_str(),i,j);
-          graphs[rwbin+b][i][j]->Write(grname);
+          char grname[100];
+          //std::cout << "Index is " << systematicProperties[a].intModes[b]-1 << std::endl;
+          sprintf(grname,"dev_%s_%s_gr_%d_%d",systematicProperties[a].shortName.c_str(),modeToName[systematicProperties[a].intModes[b]-1].c_str(),i,j);
+		  //ETA - some problem with writing large files so trying removing writing TGraphs (think it might be a problem with the size of the file)
+          //graphs[rwbin+b][i][j]->Write(grname);
         }
       }
     }
@@ -354,9 +359,12 @@ void XsecVary::WriteGraphs(std::string outputname){
       {
         for(unsigned j = 0; j < splines[rwbin+b][i].size(); j++)
         {
-          char spname[50];
-          sprintf(spname,"dev_%s_%s_sp_%d_%d",systematicProperties[a].shortName.c_str(),modeToName[systematicProperties[a].intModes[b]].c_str(),i,j);
+          char spname[100];
+          sprintf(spname,"dev_%s_%s_sp_%d_%d",systematicProperties[a].shortName.c_str(),modeToName[systematicProperties[a].intModes[b] -1].c_str(),i,j);
           splines[rwbin+b][i][j]->Write(spname);
+		  //if(systematicProperties[a].intModes[b] == 10){
+			//std::cout << spname << std::endl;
+		  //}
         }
       }
     }

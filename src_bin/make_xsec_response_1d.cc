@@ -34,10 +34,15 @@ using std::endl;
 bool nue = false;
 bool NHC = true;
 bool byEvent_splines = false;
-std::string fTempFilenue =  "inputs/DUNE_numu_templates_v0.root";
-std::string fTempFilenumu =  "inputs/DUNE_numu_templates_v0.root";
-std::string fTempFilenue_erec =  "inputs/DUNE_numu_templates_v0_erec.root";
-std::string fTempFilenumu_erec =  "inputs/DUNE_numu_templates_v0_erec.root";
+//std::string fTempFilenue =  "inputs/DUNE_numu_templates_v0.root";
+//std::string fTempFilenumu =  "inputs/DUNE_numu_templates_v0.root";
+//std::string fTempFilenue_erec =  "inputs/DUNE_numu_templates_v0_erec.root";
+//std::string fTempFilenumu_erec =  "inputs/DUNE_numu_templates_v0_erec.root";
+std::string fTempFilenue =  "inputs/DUNE_numu_templates_v1_coarse.root";
+std::string fTempFilenumu =  "inputs/DUNE_numu_templates_v1_coarse.root";
+std::string fTempFilenue_erec =  "inputs/DUNE_numu_templates_v1_coarse.root";
+std::string fTempFilenumu_erec =  "inputs/DUNE_numu_templates_v1_coarse.root";
+
 std::string fCovFile = "inputs/flux_covariance_13av1_prelim.root";
 std::string wtfile = "";
 std::string mtuple = "";
@@ -89,7 +94,7 @@ int main(int argc, char *argv[])
     else std::cout << "Using numu selection" << std::endl;
 
     //Change File paths
-    outfile = "../m3_dune/inputs/mtuples/AllSplines/" + outfile;
+    //outfile = "../m3_dune/inputs/mtuples/AllSplines/" + outfile;
     std::cout << "THE OUTPUT FILE IS: " << outfile << std::endl; 
     //Open template files and covariance files
     TFile *ftemp_nue = new TFile(fTempFilenue.c_str()); 
@@ -136,12 +141,13 @@ int main(int argc, char *argv[])
     // Vectors containing interaction mode codes that will eventually be associated with a
     // particular systematic. These are the modes this systematic affects.
     std::vector<int> ccqemodes; ccqemodes.push_back(1);
+	std::vector<int> mecmodes; mecmodes.push_back(2);
     std::vector<int> resmodes; resmodes.push_back(4);
     std::vector<int> dismodes; dismodes.push_back(3);
     std::vector<int> disresmodes; disresmodes.push_back(3); disresmodes.push_back(4);
-    std::vector<int> mostmodes; mostmodes.push_back(1); mostmodes.push_back(3); mostmodes.push_back(4); mostmodes.push_back(10);
+    std::vector<int> mostmodes; mostmodes.push_back(1); mostmodes.push_back(3); mostmodes.push_back(4); mostmodes.push_back(2);
     std::vector<int> allmodes; 
-    for(int i = 0; i <= 11; i++) 
+    for(int i = 1; i <= 14; i++) 
       allmodes.push_back(i);
 
     // Specify for which systematics we would like splines produced.
@@ -155,14 +161,6 @@ int main(int argc, char *argv[])
     //     supplied weight file
     // (5) [optional] Should extra knots be made to extend the range of systematic
     //      values in the splines, creating flat(ish) edges? (boolean)
-	//
-	///    SystematicProperties pfo_sysprop("NIWG2014a_pF_O16","pfo",ccqemode,6,true);
-    //    SystematicProperties maqe_sf_sysprop("NXSec_MaCCQE_SF","maqesf",ccqemode,14);
-	//    SystematicProperties dismpishp_sysprop("NIWG2012a_dismpishp","dismpishp",ccothmode,6);
-	//    SystematicProperties berpaA_sysprop("NIWG_Effective_rpaCCQE_A","erpa_A",ccqemode,6);
-	//    SystematicProperties berpaB_sysprop("NIWG_Effective_rpaCCQE_B","erpa_B",ccqemode,6);
-	//    SystematicProperties berpaC_sysprop("NIWG_Effective_rpaCCQE_C","erpa_D",ccqemode,6);
-	//    SystematicProperties berpaD_sysprop("NIWG_Effective_rpaCCQE_D","erpa_E",ccqemode,6);
    
    // DUNE SYSTEMATICS
  
@@ -170,6 +168,7 @@ int main(int argc, char *argv[])
     SystematicProperties vecffqeshape_sysprop("VecFFCCQEshape","vecffqeshape", ccqemodes,3); //1
     //SystematicProperties mancel_sysprop("MaNCEL","mancel", allmodes,3); //? **
     //SystematicProperties etancel_sysprop("EtaNCEL","etancel", allmodes,3);//? **
+	//ETA - this feels like a bug.... we're not giving any different modes to CC and NC events....
     SystematicProperties mares_sysprop("MaCCRES","mares", resmodes,3);//4
     SystematicProperties mvres_sysprop("MvCCRES","mvres", resmodes,3);//4
     SystematicProperties mancres_sysprop("MaNCRES","mancres", resmodes,3);//4
@@ -183,11 +182,20 @@ int main(int argc, char *argv[])
     SystematicProperties cv2uby_sysprop("CV2uBY", "cv2uby", dismodes,3); //3
     //SystematicProperties formzone_sysprop("FormZone", "formzone", dismodes,3); //3 **
     //SystematicProperties mfppi_sysprop("MFP_pi", "mfppi", dismodes,3);//3 **
+	/*
     SystematicProperties frcexpi_sysprop("FrCEx_pi", "frcexpi", disresmodes,3);//3,4
     SystematicProperties frelaspi_sysprop("FrElas_pi", "frelaspi", disresmodes,3);//3,4
     SystematicProperties frinelpi_sysprop("FrInel_pi", "frinelpi", disresmodes,3);//3,4
     SystematicProperties frabspi_sysprop("FrAbs_pi", "frabspi", disresmodes,3);//3,4
     SystematicProperties frpiprodpi_sysprop("FrPiProd_pi", "frpiprodpi", disresmodes,3);//3,4
+	*/
+
+    SystematicProperties frcexpi_sysprop("FrCEx_pi", "frcexpi", allmodes,3);//3,4
+    SystematicProperties frelaspi_sysprop("FrElas_pi", "frelaspi", allmodes,3);//3,4
+    SystematicProperties frinelpi_sysprop("FrInel_pi", "frinelpi", allmodes,3);//3,4
+    SystematicProperties frabspi_sysprop("FrAbs_pi", "frabspi", allmodes,3);//3,4
+    SystematicProperties frpiprodpi_sysprop("FrPiProd_pi", "frpiprodpi", allmodes,3);//3,4
+
     //SystematicProperties mfpn_sysprop("MFP_N", "mfpn", mostmodes,3);//1,3,4,10 **
     SystematicProperties frcexn_sysprop("FrCEx_N", "frcexn", mostmodes,3);//1,3,4,10
     SystematicProperties frelasn_sysprop("FrElas_N", "frelasn", mostmodes,3);//1,3,4,10
@@ -197,10 +205,10 @@ int main(int argc, char *argv[])
     SystematicProperties pauli_sysprop("CCQEPauliSupViaKF", "pauli", ccqemodes,3);//1
     //SystematicProperties gauss_sysprop("Mnv2p2hGaussEnhancement", "gauss", allmodes,3);//1,3,4,5,10 *
     //SystematicProperties mkspp_sysprop("MKSPP_ReWeight", "mkspp", allmodes,3);//1,3,4,5,10**
-    SystematicProperties e2anu_sysprop("E2p2h_A_nu", "e2anu", allmodes,3);//1,3,4,5,7,10 
-    SystematicProperties e2bnu_sysprop("E2p2h_B_nu", "e2bnu", allmodes,3);//1,3,4,5,7,10
-    SystematicProperties e2anubar_sysprop("E2p2h_A_nubar", "e2anubar", allmodes,3);//1,3,4,5,7,10
-    SystematicProperties e2bnubar_sysprop("E2p2h_B_nubar", "e2bnubar", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties e2anu_sysprop("E2p2h_A_nu", "e2anu", mecmodes,3);//1,3,4,5,7,10 
+    SystematicProperties e2bnu_sysprop("E2p2h_B_nu", "e2bnu", mecmodes,3);//1,3,4,5,7,10
+    SystematicProperties e2anubar_sysprop("E2p2h_A_nubar", "e2anubar", mecmodes,3);//1,3,4,5,7,10
+    SystematicProperties e2bnubar_sysprop("E2p2h_B_nubar", "e2bnubar", mecmodes,3);//1,3,4,5,7,10
     SystematicProperties nuncc2_sysprop("NR_nu_n_CC_2Pi", "nuncc2", allmodes,3);//1,3,4,5,7,10
     SystematicProperties nuncc3_sysprop("NR_nu_n_CC_3Pi", "nuncc3", allmodes,3);//1,3,4,5,7,10
     SystematicProperties nupcc2_sysprop("NR_nu_p_CC_2Pi", "nupcc2", allmodes,3);//1,3,4,5,7,10
@@ -224,55 +232,21 @@ int main(int argc, char *argv[])
     SystematicProperties nubarpnc1_sysprop("NR_nubar_p_NC_1Pi", "nubarpnc1", allmodes,3);//1,3,4,5,7,10
     SystematicProperties nubarpnc2_sysprop("NR_nubar_p_NC_2Pi", "nubarpnc2", allmodes,3);//1,3,4,5,7,10
     SystematicProperties nubarpnc3_sysprop("NR_nubar_p_NC_3Pi", "nubarpnc3", allmodes,3);//1,3,4,5,7,10
-    SystematicProperties berpaa_sysprop("BeRPA_A", "berpaa", allmodes,3);//1,3,4,5,7,10
-    SystematicProperties berpab_sysprop("BeRPA_B", "berpab", allmodes,3);//1,3,4,5,7,10
-    SystematicProperties berpad_sysprop("BeRPA_D", "berpad", allmodes,3);//1,3,4,5,7,10
-    //SystematicProperties berpae_sysprop("BeRPA_E", "berpae", allmodes,3);//1,3,4,5,7,10 **
+    SystematicProperties berpaa_sysprop("BeRPA_A", "berpaa", ccqemodes,3);//1,3,4,5,7,10
+    SystematicProperties berpab_sysprop("BeRPA_B", "berpab", ccqemodes,3);//1,3,4,5,7,10
+    SystematicProperties berpad_sysprop("BeRPA_D", "berpad", ccqemodes,3);//1,3,4,5,7,10
+    //SystematicProperties berpae_sysprop("BeRPA_E", "berpae", allmodes,2);//1,3,4,5,7,10 **
     //SystematicProperties lepmom_sysprop("EbFSLepMomShift", "lepmom", allmodes,3);//1,3,4,5,7,10 **
-    SystematicProperties c12nu_sysprop("C12ToAr40_2p2hScaling_nu", "c12nu", allmodes,3);//1,3,4,5,7,10
-    SystematicProperties c12nubar_sysprop("C12ToAr40_2p2hScaling_nubar", "c12nubar", allmodes,3);//1,3,4,5,7,10
+    SystematicProperties c12nu_sysprop("C12ToAr40_2p2hScaling_nu", "c12nu", mecmodes,3);//1,3,4,5,7,10
+    SystematicProperties c12nubar_sysprop("C12ToAr40_2p2hScaling_nubar", "c12nubar", mecmodes,3);//1,3,4,5,7,10
     SystematicProperties nuexsec_sysprop("nuenuebar_xsec_ratio", "nuexsec", allmodes,3);//1,3,4,5,7,10
     SystematicProperties nuemuxsec_sysprop("nuenumu_xsec_ratio", "nuemuxsec", allmodes,3);//1,3,4,5,7,10
     //SystematicProperties q2sup_sysprop("SPPLowQ2Suppression", "q2sup", allmodes,3);//1,3,4,5,10 **
     //SystematicProperties fsismear_sysprop("FSILikeEAvailSmearing", "fsismear", allmodes,3);//1,3,4,5,7,10 **
 
-    //SystematicProperties mec_sysprop("NIWGMEC_PDDWeight_O16","mecpdd",mecmode,3);
-    //SystematicProperties ca5_sysprop("NXSec_CA5RES","ca5",pimodes,3);
-    //SystematicProperties manff_sysprop("NXSec_MaRES","manff",pimodes,3);
-    //SystematicProperties bgscl_sysprop("NXSec_BgSclRES","bgscl",pimodes,3);
-	//ETA adding I-1/2 anti-nu parameter
-	//SystematicProperties bgsclbar_sysprop("NXSec_BgSclLMCPiBarRES", "bgsclbar", pimodes, 3);
-
-	// Due to special treatment of FSI params the nominal knot for FSIPIPROD is knot 1
-	//SystematicProperties FSI_NCasc_FrAbs_pi_sysprop("NCasc_FrAbs_pi","FSIPIABS",allmodes,3);
-	//SystematicProperties FSI_NCasc_FrInelLow_pi_sysprop("NCasc_FrInelLow_pi","FSIINELLO",allmodes,3);
-	//SystematicProperties FSI_NCasc_FrCExLow_pi_sysprop("NCasc_FrCExLow_pi","FSICEXLO",allmodes,3);
-	//SystematicProperties FSI_NCasc_FrCExHigh_pi_sysprop("NCasc_FrCExHigh_pi","FSICEXHI",allmodes,3);  //ETA- NOT USUALLY IN THE OA
-	//SystematicProperties FSI_NCasc_FrInelHigh_pi_sysprop("NCasc_FrInelHigh_pi","FSIINELHI",allmodes,3);
-	//SystematicProperties FSI_NCasc_FrPiProd_pi_sysprop("NCasc_FrPiProd_pi","FSIPIPROD",allmodes,1);
-	// ETA CCDIS and CCMpi parameters for 2020OA
-	//SystematicProperties BY_DIS_sysprop("NIWG_DIS_BY", "DISBY", ccdismode,3);
-	//SystematicProperties BY_MPi_sysprop("NIWG_MultiPi_BY", "MPiBY", ccmpimode,3);
-	//SystematicProperties Xsec_AGKY_sysprop("NIWG_MultiPi_Xsec_AGKY", "MPiAGKYXsec", ccmpimode,3);
-	//ETA adding 2p2h which wasn't in this branch...
-	//SystematicProperties Edep2p2h_lowEnu_sysprop("NIWG_2p2hEdep_lowEnu","2p2hedeplowenu", mecmode, 1);
-	//SystematicProperties Edep2p2h_highEnu_sysprop("NIWG_2p2hEdep_highEnu", "2p2hedephienu", mecmode, 1);
-	//SystematicProperties Edep2p2h_lowEnubar_sysprop("NIWG_2p2hEdep_lowEnubar", "2p2hedeplowenubar", mecmode, 1);
-	//SystematicProperties Edep2p2h_highEnubar_sysprop("NIWG_2p2hEdep_highEnubar", "2p2hedephienubar", mecmode, 1);
-	//ETA adding low Q2 params for VALOR
-	//Changing the name of the spline to be consistent with ND280
-	// i.e. move to C++ indexing in the name                     
-	//SystematicProperties LowQ2Suppression_1_sysprop("NIWGQETwk_LowQ2Suppression1", "LowQ2Suppression0", ccqemode, 3);
-	//SystematicProperties LowQ2Suppression_2_sysprop("NIWGQETwk_LowQ2Suppression2", "LowQ2Suppression1", ccqemode, 3);
-	//SystematicProperties LowQ2Suppression_3_sysprop("NIWGQETwk_LowQ2Suppression3", "LowQ2Suppression2", ccqemode, 3);
-	//SystematicProperties LowQ2Suppression_4_sysprop("NIWGQETwk_LowQ2Suppression4", "LowQ2Suppression3", ccqemode, 3);
-	//SystematicProperties LowQ2Suppression_5_sysprop("NIWGQETwk_LowQ2Suppression5", "LowQ2Suppression4", ccqemode, 3);
-	//SystematicProperties LowQ2Suppression_6_sysprop("NIWGQETwk_LowQ2Suppression6", "LowQ2Suppression5", ccqemode, 3);
-	//SystematicProperties LowQ2Suppression_7_sysprop("NIWGQETwk_LowQ2Suppression7", "LowQ2Suppression6", ccqemode, 3);
-	//SystematicProperties LowQ2Suppression_8_sysprop("NIWGQETwk_LowQ2Suppression8", "LowQ2Suppression7", ccqemode, 3);
 
     // Put these systematics in a list
-    std::vector<SystematicProperties> systProps;   
+    std::vector<SystematicProperties> systProps;   	
     systProps.push_back(maqe_sysprop);
     systProps.push_back(vecffqeshape_sysprop);
     //systProps.push_back(mancel_sysprop);
@@ -341,7 +315,8 @@ int main(int argc, char *argv[])
     systProps.push_back(nuexsec_sysprop);
     systProps.push_back(nuemuxsec_sysprop);
     //systProps.push_back(q2sup_sysprop);
-    //systProps.push_back(fsismear_sysprop);
+    //systProps.push_back(fsismear_sysprop);	
+
 
     // Call the XSecVary class constructor
     XsecVary xs(wtfile, mtuple, systProps, nutype);
