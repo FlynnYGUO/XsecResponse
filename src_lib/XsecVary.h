@@ -93,12 +93,7 @@ class XsecVary {
     Float_t         CosThetamu;
   
     // Declaration of leaf types: fChain
-    Int_t           iclass;
-	Int_t           Ibound;
     //Double_t        erec;
-    Double_t        pizmass;
-    Double_t        pizmom;
-    Double_t        pizcosb;
     Double_t        wgtflx;
     Double_t        wgtosc;
     //Float_t         wgtosc;
@@ -111,114 +106,35 @@ class XsecVary {
 	Float_t         fqmreloss[200][6];
 	Float_t         fqmomm; //Single ring reco muon mom
 	Float_t         fqmome; //Single ring reco electron mom
-	Int_t           ipp; //index of 2R pi+pi+ fit
-    Int_t           npar;
-    Float_t         wallv;
-    Float_t         ipv[50];
-    Float_t         posv[3];
-    Float_t         dirv[50][3];
-    Float_t         pmomv[50];
-    Int_t           npar2;
-    Int_t           ipv2[50];
     Int_t           numnu;
     Int_t           mode;
     Int_t           ipnu[50];
     Double_t         pnu[50];
-    Float_t         dirnu[50][3];
-    Int_t           Npvc;
-    Int_t           Ipvc[100];
-    Int_t           Ichvc[100];
-    Int_t           Iorgvc[100];
-    Int_t           Iflvc[100];
-    Float_t         Abspvc[100];
-    Float_t         Pvc[100][3];
-    Float_t         Crsx;
-    Float_t         Crsy;
-    Float_t         Crsz;
-    Float_t         Crsphi;
-    Int_t           Nvert;
-    Float_t         Posvert[300][3];
-    Int_t           Iflgvert[300];
-    Int_t           Nvcvert;
-    Float_t         Dirvert[900][3];
-    Float_t         Abspvert[900];
-    Float_t         Abstpvert[900];
-    Int_t           Ipvert[900];
-    Int_t           Iverti[900];
-    Int_t           Ivertf[900];
-    Float_t         Fsiprob;
-    Float_t         posc[2][6];
-    Int_t           EventType;
-    Double_t        FlxWeight;
-    Double_t        OscWeight;
-    Float_t         pi0mass[2];
+    
+    // List of branches: fChain
+    TBranch        *b_iclass;   //!
+	TBranch        *b_Ibound;
+    TBranch        *b_erec;   //!
+    TBranch        *b_mode;   //!
+    TBranch        *b_ipnu;   //!
+    TBranch        *b_pnu;   //!
+    
+
+  //DUNE VARIABLES FD
     Double_t        erec_numu;
     Double_t        erec_nue;
     Double_t        cvnnumu;
     Double_t        cvnnue;
+    Int_t           isCC;
+    Double_t        vtx_x;
+    Double_t        vtx_y;
+    Double_t        vtx_z;
+    Double_t        berpacv;
+
     // Declaration of leaf types: fTree_byEv
     Float_t         Etrue;
     Float_t         Erec_check;
   
-    // List of branches: fChain
-    TBranch        *b_iclass;   //!
-	TBranch        *b_Ibound;
-	TBranch        *b_fqmomm;
-	TBranch        *b_fqmome;
-	TBranch        *b_fqmrdir;
-	TBranch        *b_fq1rdir;
-	TBranch        *b_fqmrmom;
-	TBranch        *b_fqmreloss;
-	//ETA - need ipp i.e. the index of the 2Rpipi fit for the numuCC1pi samples
-	TBranch        *b_ipp;
-    TBranch        *b_erec;   //!
-    TBranch        *b_pizmass;   //!
-    TBranch        *b_pizmom;   //!
-    TBranch        *b_pizcosb;   //!
-    TBranch        *b_wgtflx;   //!
-    TBranch        *b_wgtosc;   //!
-    TBranch        *b_dir;   //!
-    TBranch        *b_amome;   //!
-    TBranch        *b_npar;   //!
-    TBranch        *b_wallv;   //!
-    TBranch        *b_ipv;   //!
-    TBranch        *b_posv;   //!
-    TBranch        *b_dirv;   //!
-    TBranch        *b_pmomv;   //!
-    TBranch        *b_npar2;   //!
-    TBranch        *b_ipv2;   //!
-    TBranch        *b_numnu;   //!
-    TBranch        *b_mode;   //!
-    TBranch        *b_ipnu;   //!
-    TBranch        *b_pnu;   //!
-    TBranch        *b_dirnu;   //!
-    TBranch        *b_Npvc;   //!
-    TBranch        *b_Ipvc;   //!
-    TBranch        *b_Ichvc;   //!
-    TBranch        *b_Iorgvc;   //!
-    TBranch        *b_Iflvc;   //!
-    TBranch        *b_Abspvc;   //!
-    TBranch        *b_Pvc;   //!
-    TBranch        *b_Crsx;   //!
-    TBranch        *b_Crsy;   //!
-    TBranch        *b_Crsz;   //!
-    TBranch        *b_Crsphi;   //!
-    TBranch        *b_Nvert;   //!
-    TBranch        *b_Posvert;   //!
-    TBranch        *b_Iflgvert;   //!
-    TBranch        *b_Nvcvert;   //!
-    TBranch        *b_Dirvert;   //!
-    TBranch        *b_Abspvert;   //!
-    TBranch        *b_Abstpvert;   //!
-    TBranch        *b_Ipvert;   //!
-    TBranch        *b_Iverti;   //!
-    TBranch        *b_Ivertf;   //!
-    TBranch        *b_Fsiprob;   //!
-    TBranch        *b_posc;   //!
-    TBranch        *b_EventType;
-    TBranch        *b_FlxWeight;
-    TBranch        *b_OscWeight;
-    TBranch        *b_pi0mass;
   
     // Vectors of splines, graphs, and histograms
     std::vector< std::vector< TH2F* > > dev_tmp;
@@ -417,8 +333,7 @@ void XsecVary::AddSystematics(std::vector<SystematicProperties> &systProps)
   
     fChain->SetBranchAddress(weightBrName.c_str(),&(systProps[j].weightArray),&(systProps[j].weightBranch));
     fChain->SetBranchAddress(knotBrName.c_str(),&(systProps[j].knotArray),&(systProps[j].knotBranch));
-    
-
+  
     numSplines += systProps[j].intModes.size();
 
   }
@@ -428,7 +343,7 @@ void XsecVary::AddSystematics(std::vector<SystematicProperties> &systProps)
   fChain->GetEntry(0);
   unsigned int itty = 0;
   //std::string modeToName[] = {"ccqe","cc1pi","cccoh","ccmisc","ncpiz","ncpipm","nccoh","ncoth","mec", "nc1gamma", "ccmpi", "ccdis"};//ETA adding ccmpi and ccdis for 2020OA, ccoth now ccmisc also was nc1gamma missing??
-  std::string modeToName[] = {"qe", "mec", "dis", "res", "coh", "diff", "nueel", "unknown", "amnugamma", "unknown", "cohel", "ibd", "glasres", "imdannihilation"};
+  std::string modeToName[] = {"ccqe", "ccmec", "ccdis", "ccres", "cccoh", "ccdiff", "ccnueel", "unknown", "ccamnugamma", "unknown", "cccohel", "ccibd", "ccglasres", "ccimdannihilation", "ncqe", "ncmec", "ncdis", "ncres", "nccoh", "ncdiff", "ncnueel", "ncamnugamma", "nccohel", "ncibd", "ncglasres", "ncimdannihilation"};
 
   for(int k = 0; k < numSysts; k++)
   {
@@ -478,65 +393,8 @@ void XsecVary::Init()
   fCurrent = -1;
   fChain->SetMakeClass(1);
 
-  //fChain->SetBranchAddress("iclass", &iclass, &b_iclass);
-  //fChain->SetBranchAddress("Ibound", &Ibound, &b_Ibound);
-  //fChain->SetBranchAddress("fqmomm", &fqmomm, &b_fqmomm);
-  //fChain->SetBranchAddress("fqmome", &fqmome, &b_fqmome);
-  //fChain->SetBranchAddress("fqmrmom", &fqmrmom, &b_fqmrmom);
-  //fChain->SetBranchAddress("fqmreloss", &fqmreloss, &b_fqmreloss);
-  //fChain->SetBranchAddress("fqmrdir", &fqmrdir, &b_fqmrdir);
-  //fChain->SetBranchAddress("fq1rdir", &fq1rdir, &b_fq1rdir);
-  //fChain->SetBranchAddress("ipp", &ipp, &b_ipp);
-  //fChain->SetBranchAddress("erec", &Erec_check, &b_erec);
-  //fChain->SetBranchAddress("pizmass", &pizmass, &b_pizmass);
-  //fChain->SetBranchAddress("pizmom", &pizmom, &b_pizmom);
-  //fChain->SetBranchAddress("pizcosb", &pizcosb, &b_pizcosb);
-  //fChain->SetBranchAddress("wgtflx", &wgtflx, &b_wgtflx);
-  //fChain->SetBranchAddress("wgtosc", &wgtosc, &b_wgtosc);
-  //fChain->SetBranchAddress("dir", dir, &b_dir);
-  //fChain->SetBranchAddress("amome", amome, &b_amome);
-  //fChain->SetBranchAddress("npar", &npar, &b_npar);
-  //fChain->SetBranchAddress("wallv", &wallv, &b_wallv);
-  //fChain->SetBranchAddress("ipv", ipv, &b_ipv);
-  //fChain->SetBranchAddress("posv", posv, &b_posv);
-  //fChain->SetBranchAddress("dirv", dirv, &b_dirv);
-  //fChain->SetBranchAddress("pmomv", pmomv, &b_pmomv);
-  //fChain->SetBranchAddress("npar2", &npar2, &b_npar2);
-  //fChain->SetBranchAddress("ipv2", ipv2, &b_ipv2);
-  //fChain->SetBranchAddress("numnu", &numnu, &b_numnu);
-  //fChain->SetBranchAddress("mode", &mode, &b_mode);
-  //fChain->SetBranchAddress("nuPDG", ipnu, &b_ipnu);
-  //fChain->SetBranchAddress("Ev", pnu, &b_pnu);
-  //fChain->SetBranchAddress("dirnu", dirnu, &b_dirnu);
-  //fChain->SetBranchAddress("Npvc", &Npvc, &b_Npvc);
-  //fChain->SetBranchAddress("Ipvc", Ipvc, &b_Ipvc);
-  //fChain->SetBranchAddress("Ichvc", Ichvc, &b_Ichvc);
-  //fChain->SetBranchAddress("Iorgvc", Iorgvc, &b_Iorgvc);
-  //fChain->SetBranchAddress("Iflvc", Iflvc, &b_Iflvc);
-  //fChain->SetBranchAddress("Abspvc", Abspvc, &b_Abspvc);
-  //fChain->SetBranchAddress("Pvc", Pvc, &b_Pvc);
-  //fChain->SetBranchAddress("Crsx", &Crsx, &b_Crsx);
-  //fChain->SetBranchAddress("Crsy", &Crsy, &b_Crsy);
-  //fChain->SetBranchAddress("Crsz", &Crsz, &b_Crsz);
-  //fChain->SetBranchAddress("Crsphi", &Crsphi, &b_Crsphi);
-  //fChain->SetBranchAddress("Nvert", &Nvert, &b_Nvert);
-  //fChain->SetBranchAddress("Posvert", Posvert, &b_Posvert);
-  //fChain->SetBranchAddress("Iflgvert", Iflgvert, &b_Iflgvert);
-  //fChain->SetBranchAddress("Nvcvert", &Nvcvert, &b_Nvcvert);
-  //fChain->SetBranchAddress("Dirvert", Dirvert, &b_Dirvert);
-  //fChain->SetBranchAddress("Abspvert", Abspvert, &b_Abspvert);
-  //fChain->SetBranchAddress("Abstpvert", Abstpvert, &b_Abstpvert);
-  //fChain->SetBranchAddress("Ipvert", Ipvert, &b_Ipvert);
-  //fChain->SetBranchAddress("Iverti", Iverti, &b_Iverti);
-  //fChain->SetBranchAddress("Ivertf", Ivertf, &b_Ivertf);
-  //fChain->SetBranchAddress("Fsiprob", &Fsiprob, &b_Fsiprob);
-  //fChain->SetBranchAddress("posc", posc, &b_posc);
-  /* fChain->SetBranchAddress("EventType", &EventType, &b_EventType); */
-  /* fChain->SetBranchAddress("FlxWeight", &FlxWeight, &b_FlxWeight); */
-  /* fChain->SetBranchAddress("OscWeight", &OscWeight, &b_OscWeight); */
-  /* fChain->SetBranchAddress("pi0mass", &pi0mass, &b_pi0mass); */
 
-  // DUNE CAF Variables
+  // DUNE FD CAF Variables
   fChain->SetBranchAddress("cvnnumu", &cvnnumu);
   fChain->SetBranchAddress("cvnnue", &cvnnue);
   fChain->SetBranchAddress("Ev_reco_numu", &erec_numu);
@@ -545,6 +403,11 @@ void XsecVary::Init()
   fChain->SetBranchAddress("Ev", pnu, &b_pnu);
   fChain->SetBranchAddress("mode", &mode, &b_mode);
   fChain->SetBranchAddress("wgtosc", &wgtosc);
+  fChain->SetBranchAddress("isCC", &isCC);
+  fChain->SetBranchAddress("vtx_x", &vtx_x);
+  fChain->SetBranchAddress("vtx_y", &vtx_y);
+  fChain->SetBranchAddress("vtx_z", &vtx_z);
+  fChain->SetBranchAddress("BeRPA_A_cvwgt", &berpacv);
   Notify();
 }
 
@@ -566,5 +429,12 @@ void XsecVary::Show(Long64_t entry)
    if (!fChain) return;
    fChain->Show(entry);
 }
+
+//DUNE FD FV cut
+inline bool IsInFDFV(double pos_x_cm, double pos_y_cm, double pos_z_cm) 
+{
+  return (abs(pos_x_cm) < 310 && abs(pos_y_cm) < 550 && pos_z_cm > 50 && pos_z_cm < 1244);
+}
+
 
 #endif // #ifdef XsecVary_cxx

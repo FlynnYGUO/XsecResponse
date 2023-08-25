@@ -16,23 +16,6 @@ void XsecVary2D::MakeVariations()
 
   if (fChain == 0 ) return;
 
-  // Check whether making variations for 1Rnue or 1Rnumu events
-  switch(SampleType)
-  {
-    case 0: // nue
-      std::cout << "Making variations for Nue splines" << std::endl;
-      std::cout << "With the current code, this doesn't actually mean anything!" << std::endl;
-      break;
-    case 1: // numu
-      std::cout << "Making variations for Numu splines" << std::endl;
-      std::cout << "With the current code, this doesn't actually mean anything!" << std::endl;
-      break;
-    default: // Something's wrong, SampleType not set
-      std::cerr << "Error: SampleType not set correctly" << std::endl
-       	 << "Please use SampleType = 0 for nue, or SampleType = 1 for numu" << std::endl;
-      std::cout << "With the current code, this doesn't actually mean anything!" << std::endl;
-  }
-
   // define a "map" from interaction mode number (which is the element number within the array)
   // to a string describing the interaction type
   
@@ -41,56 +24,92 @@ void XsecVary2D::MakeVariations()
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     fChain->GetEntry(jentry); 
-
-
-    if(cvnnue>0.85){erec=erec_nue;}
-    else {erec=erec_numu;}
-    if((iclass == 11 || iclass ==13) && (abs(Erec-erec) > 1E-5)){std::cout << "ERROR::Calculated Erec of " << erec << " but in minituples it's " << Erec << std::endl;}
-
     double firstpar=0;
-    if(erec_1d&&!p_1d)
-    {
-      firstpar=erec/1000.; // MeV
-    }
-    else
-    {
-      std::cerr << "parameter is not o!!" << std::endl;
-      exit(1);
-    }
+    firstpar=erec_caf; // MeV
 
+	
     double secondpar = 0;
-    if(theta_2d && !Q2_2d && !N_2d)
-    {
-      std::cerr<<"Second parameter not implemented yet"<<std::endl;
-      std::cerr<<__FILE__<<":"<<__LINE__<<std::endl;
-      throw;
-    }
-    else
-    {
-      std::cerr << "2nd parameter is neither Q2 or Theta!!" << std::endl;
-      exit(1);
-    }
+	//Yrec
+	secondpar = (erec_caf - elep_reco)/erec_caf;
+	//std::cout << "Etrue = " << pnu[1] << std::endl;
+	//std::cout << "Erec = " << firstpar << std::endl;
+	//std::cout << "Yrec = " << secondpar << std::endl;
+	//std::cout << "Elep = " << elep_reco << std::endl;
 
     //Fill up the histograms with weights
-    
+
+    bool simb_mode = false;
+
+	wgtflx = 1;
+	wgtosc = 1;
     // Determine interaction mode
-    Int_t modee = -1;
+    Int_t modee = -999;
+	if(simb_mode) {
 
-    if(abs(mode)==1) modee = 0; //CCQE
-    if(abs(mode)>=11&&abs(mode)<=13) modee = 1; //CC1pi
-    if(abs(mode)==16) modee = 2; //CCCOH
-    if( (abs(mode)>=17&&abs(mode)<30 && abs(mode) != 21 && abs(mode) != 26) || abs(mode) == 15) modee = 3; //CCMisc ETA: making changes for 2020OA where we have splines that specifically effect CCDIS and CCMpi
-    if(abs(mode)==31||abs(mode)==32) modee = 4; //NCpi0
-    if(abs(mode)==33||abs(mode)==34) modee = 5; //NCpi+/-
-    if(abs(mode)==36) modee = 6; //NCCOH
-    if((abs(mode)>=37&&abs(mode)<=52) || abs(mode)==35) modee = 7; //NCOTH includes NCEL
-    if(abs(mode)==2) modee = 8; //MEC
-    if(abs(mode)==38 || abs(mode)==39) modee = 9; //NC1gamma
-	if(abs(mode) == 21){modee = 10;} //CCMpi
-	if(abs(mode) == 26){modee = 11;} //CCDIS
+      if((abs(mode)==-1) && (isCC == 1)) modee = -999; //Unknown
+      if((abs(mode)==0) && (isCC == 1)) modee = 1; //CCQE
+      if((abs(mode)==2) && (isCC == 1)) modee = 3; //CC DIS
+      if((abs(mode)==1) && (isCC == 1)) modee = 4; //CC RES
+      if((abs(mode)==3) && (isCC == 1)) modee = 5; //CC COH
+      if((abs(mode)==11) && (isCC == 1)) modee = 6; //CC Diffractive
+      if((abs(mode)==5) && (isCC == 1)) modee = 7; //CC Electron scattering
+      if((abs(mode)==9) && (isCC == 1)) modee = 9; //CC AMnuGamma
+      if((abs(mode)==10) && (isCC == 1)) modee = 2; //CC MEC
+      if((abs(mode)==4) && (isCC == 1)) modee = 11; //CC COH Elastic
+      if((abs(mode)==7) && (isCC == 1)) modee = 12; // CC IBD
+      if((abs(mode)==8) && (isCC == 1)) modee = 13; //CC Glashow RES
+      if((abs(mode)==6) && (isCC == 1)) modee = 14;//CC IMD Annihalation 
    
-    if(modee == -1) std::cout << "unknown mode" << std::endl;
+      if((abs(mode)==0) && (isCC == 0)) modee = 15; //NCQE
+      if((abs(mode)==2) && (isCC == 0)) modee = 16; //NC DIS
+      if((abs(mode)==1) && (isCC == 0)) modee = 17; //NC RES
+      if((abs(mode)==3) && (isCC == 0)) modee = 18; //NC COH
+      if((abs(mode)==11) && (isCC == 0)) modee = 19; //NC Diffractive
+      if((abs(mode)==5) && (isCC == 0)) modee = 20; //NC Electron scattering
+      if((abs(mode)==9) && (isCC == 0)) modee = 21; //NC AMnuGamma
+      if((abs(mode)==10) && (isCC == 0)) modee = 22; //NC MEC
+      if((abs(mode)==4) && (isCC == 0)) modee = 23; //NC COH Elastic
+      if((abs(mode)==7) && (isCC == 0)) modee = 24; // NC IBD
+      if((abs(mode)==8) && (isCC == 0)) modee = 25; //NC Glashow RES
+      if((abs(mode)==6) && (isCC == 0)) modee = 26;//NC IMD Annihalation
 
+      if(modee == -999) std::cout << "unknown mode: " << abs(mode) << " IsCC: " << isCC << std::endl;
+	}
+
+	else {
+
+      if((abs(mode)==-1) && (isCC == 1)) modee = -999; //Unknown
+      if((abs(mode)==1) && (isCC == 1)) modee = 1; //CCQE
+      if((abs(mode)==3) && (isCC == 1)) modee = 3; //CC DIS
+      if((abs(mode)==4) && (isCC == 1)) modee = 4; //CC RES
+      if((abs(mode)==5) && (isCC == 1)) modee = 5; //CC COH
+      if((abs(mode)==6) && (isCC == 1)) modee = 6; //CC Diffractive
+      if((abs(mode)==7) && (isCC == 1)) modee = 7; //CC Electron scattering
+      if((abs(mode)==9) && (isCC == 1)) modee = 9; //CC AMnuGamma
+      if((abs(mode)==10) && (isCC == 1)) modee = 2; //CC MEC
+      if((abs(mode)==11) && (isCC == 1)) modee = 11; //CC COH Elastic
+      if((abs(mode)==12) && (isCC == 1)) modee = 12; // CC IBD
+      if((abs(mode)==13) && (isCC == 1)) modee = 13; //CC Glashow RES
+      if((abs(mode)==14) && (isCC == 1)) modee = 14;//CC IMD Annihalation 
+      if((abs(mode)==8) && (isCC == 1)) modee = 14;//CC IMD Annihalation 
+   
+      if((abs(mode)==1) && (isCC == 0)) modee = 15; //NCQE
+      if((abs(mode)==3) && (isCC == 0)) modee = 16; //NC DIS
+      if((abs(mode)==4) && (isCC == 0)) modee = 17; //NC RES
+      if((abs(mode)==5) && (isCC == 0)) modee = 18; //NC COH
+      if((abs(mode)==6) && (isCC == 0)) modee = 19; //NC Diffractive
+      if((abs(mode)==7) && (isCC == 0)) modee = 20; //NC Electron scattering
+      if((abs(mode)==9) && (isCC == 0)) modee = 21; //NC AMnuGamma
+      if((abs(mode)==10) && (isCC == 0)) modee = 22; //NC MEC
+      if((abs(mode)==11) && (isCC == 0)) modee = 23; //NC COH Elastic
+      if((abs(mode)==12) && (isCC == 0)) modee = 24; // NC IBD
+      if((abs(mode)==13) && (isCC == 0)) modee = 25; //NC Glashow RES
+      if((abs(mode)==14) && (isCC == 0)) modee = 26;//NC IMD Annihalation 
+      if((abs(mode)==8) && (isCC == 0)) modee = 26;//NC IMD Annihalation 
+    
+      if(modee == -999) std::cout << "unknown mode: " << abs(mode) << std::endl;
+	}
+    
     int sysMode = 0;
 
     // loop over all systematics:
@@ -99,23 +118,26 @@ void XsecVary2D::MakeVariations()
       // loop over all interactions modes this systematic affects
       for(unsigned k = 0; k < systematicProperties[i].intModes.size(); k++)
       {
-        // is this event one of these modes?
-        if(systematicProperties[i].intModes[k] == modee)
+        // is this event one of these modes and does the event pass the selection cut
+        if(systematicProperties[i].intModes[k] == modee && IsInNDFV(vtx_x, vtx_y, vtx_z) && IsCCInclusive(reco_numu, muon_contained, muon_tracker, Ehad_veto))
         {
           // loop over all knots
           for(int j = 0 ; j < systematicProperties[i].GetWeightArray()->GetSize(); j++)
           {
             // fill the histogram
-            //dev_tmp[sysMode+k][j]->Fill(pnu[0],firstpar,secondpar,wgtflx*wgtosc*systematicProperties[i].GetWeightArray()->At(j));
-            dev_tmp[sysMode+k][j]->Fill(pnu[0],firstpar,secondpar,wgtflx*wgtosc*systematicProperties[i].GetWeightArray()->At(j));
-	    if(TMath::IsNaN(wgtflx*wgtosc*systematicProperties[i].GetWeightArray()->At(j))){
-	      std::cout << "weight" << wgtflx << ", " << wgtosc << ", " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[0]: " << pnu[0] << ", firstpar: " << firstpar << ", secondpar: " << secondpar << std::endl;
+            //dev_tmp[sysMode+k][j]->Fill(pnu[1],firstpar,secondpar,wgtflx*wgtosc*systematicProperties[i].GetWeightArray()->At(j));
+            dev_tmp[sysMode+k][j]->Fill(pnu[1],firstpar,secondpar,wgtflx*wgtosc*berpacv*systematicProperties[i].GetWeightArray()->At(j));
+
+			//std::cout << "Event = " << jentry << " || Etrue = " << pnu[1] << "|| Erec = " << firstpar << " || Yrec = " << secondpar << " || WEIGHT = " << wgtflx*wgtosc*berpacv*systematicProperties[i].GetWeightArray()->At(j) << std::endl;
+
+	    if(TMath::IsNaN(wgtflx*systematicProperties[i].GetWeightArray()->At(j))){
+	      std::cout << "weight" << wgtflx << ", " << wgtosc << ", " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[1]: " << pnu[1] << ", firstpar: " << firstpar << ", secondpar: " << secondpar << std::endl;
             }
 
 	    double www = wgtflx*wgtosc*systematicProperties[i].GetWeightArray()->At(j);
 		//double www = wgtflx*systematicProperties[i].GetWeightArray()->At(j);
 	    if(TMath::IsNaN(www) || www < 0){
-	      std::cout << "weight " << www << ", wgtflux " << wgtflx << ", wgtosc " << wgtosc << ", xsec_weight " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[0]: " << pnu[0] << ", firstpar: " << firstpar << ", secondpar: " << secondpar << ", mode: " << mode << std::endl;
+	      std::cout << "weight " << www << ", wgtflux " << wgtflx << ", wgtosc " << wgtosc << ", xsec_weight " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[1]: " << pnu[1] << ", firstpar: " << firstpar << ", secondpar: " << secondpar << ", mode: " << mode << std::endl;
 	    }
 
 
@@ -181,6 +203,8 @@ void XsecVary2D::MakeVariations()
             for(int w = 0; w < dev_tmp[sysMode+k][a]->GetNbinsZ(); w++)
             {
               int nom = systematicProperties[i].nominalPosition;
+			  std::cout << "Current mode = " << sysMode+k << " || " << " nom bin = " << nom << " || xbin = " << l+1  << " || ybin = " << j+1 << " || zbin = " << w+1 << std::endl;
+			  std::cout << "Whats in this? : " << dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1,w+1) << std::endl;
               graphs[sysMode+k][l][j][w]->SetPoint(iter,systematicProperties[i].GetKnotArray()->At(a),
                                                  (dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1,w+1) > 0. ?
                                                   dev_tmp[sysMode+k][a]->GetBinContent(l+1,j+1,w+1)/
@@ -313,9 +337,9 @@ void XsecVary2D::SetBinning(const Double_t *ebins, Int_t nebins, const Double_t 
 
 // ------------------------------------------------------------------------------------ //
 
-void XsecVary2D::WriteGraphs(char *outputname){
+void XsecVary2D::WriteGraphs(std::string outputname){
 
-  TFile fout(outputname,"RECREATE");
+  TFile fout(outputname.c_str(),"RECREATE");
   fout.cd();
 
   for(unsigned i=0; i<dev_tmp.size(); i++)
@@ -328,7 +352,7 @@ void XsecVary2D::WriteGraphs(char *outputname){
     } 
   } 
 
-  std::string modeToName[] = {"ccqe","cc1pi","cccoh","ccmisc","ncpiz","ncpipm","nccoh","ncoth","mec", "nc1gamma", "ccmpi", "ccdis"};//ETA adding ccmpi and ccdis for the 2020OA
+	std::string modeToName[] = {"ccqe", "ccmec", "ccdis", "ccres", "cccoh", "ccdiff", "ccnueel", "unknown", "ccamnugamma", "unknown", "cccohel", "ccibd", "ccglasres", "ccimdannihilation", "ncqe", "ncdis", "ncres", "nccoh", "ncdiff", "ncnueel", "ncamnugamma", "ncmec", "nccohel", "ncibd", "ncglasres", "ncimdannihilation"};
   int rwbin = 0;
   
   for(unsigned a = 0; a < systematicProperties.size(); a++)
@@ -342,10 +366,10 @@ void XsecVary2D::WriteGraphs(char *outputname){
           for(unsigned k = 0; k < (unsigned)graphs[rwbin+b][i][j].size(); k++)
           {
             char grname[50];
-            sprintf(grname,"dev_%s_%s_gr_%d_%d_%d",systematicProperties[a].shortName.c_str(),modeToName[systematicProperties[a].intModes[b]].c_str(),i,j,k);
+            sprintf(grname,"dev_%s_%s_gr_%d_%d_%d",systematicProperties[a].shortName.c_str(),modeToName[systematicProperties[a].intModes[b]-1].c_str(),i,j,k);
             graphs[rwbin+b][i][j][k]->Write(grname);
           }
-        } 
+		} 
       } 
     } 
     rwbin += systematicProperties[a].intModes.size();
@@ -365,7 +389,7 @@ void XsecVary2D::WriteGraphs(char *outputname){
           for(unsigned k = 0; k < (unsigned)splines[rwbin+b][i][j].size(); k++)
           {
             char spname[50];
-            sprintf(spname,"dev_%s_%s_sp_%d_%d_%d",systematicProperties[a].shortName.c_str(),modeToName[systematicProperties[a].intModes[b]].c_str(),i,j,k);
+            sprintf(spname,"dev_%s_%s_sp_%d_%d_%d",systematicProperties[a].shortName.c_str(),modeToName[systematicProperties[a].intModes[b]-1].c_str(),i,j,k);
             splines[rwbin+b][i][j][k]->Write(spname);
           }
         }

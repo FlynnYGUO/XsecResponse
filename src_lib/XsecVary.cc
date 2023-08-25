@@ -1,4 +1,4 @@
-// Patrick Dunne, p.dunne12@imperial.ac.uk
+// :Patrick Dunne, p.dunne12@imperial.ac.uk
 // August 11, 2021
 //
 // Adapted from T2K  XsecResponse/src_lib/XsecVary2019.cc
@@ -47,9 +47,6 @@ void XsecVary::MakeVariations()
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break; 
     fChain->GetEntry(jentry); 
-
-    //Get LepMom and LepCosTh
-    //erec = CalculateErec(iclass, LepMom, Ibound, LepCosTh);
     if (cvnnue > 0.85) {erec = erec_nue;}
     else {erec = erec_numu;}
 
@@ -75,20 +72,33 @@ void XsecVary::MakeVariations()
 
     // Determine interaction mode
     Int_t modee = -999;
-    if(abs(mode)==-1) modee = -999; //Unknown
-    if(abs(mode)==0) modee = 1; //CCQE
-    if(abs(mode)==2) modee = 3; //DIS
-    if(abs(mode)==1) modee = 4; //RES
-    if(abs(mode)==3) modee = 5; //COH
-    if(abs(mode)==11) modee = 6; //Diffractive
-    if(abs(mode)==5) modee = 7; //Electron scattering
-    if(abs(mode)==9) modee = 9; //AMnuGamma
-    if(abs(mode)==10) modee = 2; //MEC
-    if(abs(mode)==4) modee = 11; //COH Elastic
-    if(abs(mode)==7) modee = 12; // IBD
-    if(abs(mode)==8)modee = 13; //Glashow RES
-    if(abs(mode)==6)modee = 14;//IMD Annihalation 
+    if((abs(mode)==-1) && (isCC == 1)) modee = -999; //Unknown
+    if((abs(mode)==0) && (isCC == 1)) modee = 1; //CCQE
+    if((abs(mode)==2) && (isCC == 1)) modee = 3; //CC DIS
+    if((abs(mode)==1) && (isCC == 1)) modee = 4; //CC RES
+    if((abs(mode)==3) && (isCC == 1)) modee = 5; //CC COH
+    if((abs(mode)==11) && (isCC == 1)) modee = 6; //CC Diffractive
+    if((abs(mode)==5) && (isCC == 1)) modee = 7; //CC Electron scattering
+    if((abs(mode)==9) && (isCC == 1)) modee = 9; //CC AMnuGamma
+    if((abs(mode)==10) && (isCC == 1)) modee = 2; //CC MEC
+    if((abs(mode)==4) && (isCC == 1)) modee = 11; //CC COH Elastic
+    if((abs(mode)==7) && (isCC == 1)) modee = 12; // CC IBD
+    if((abs(mode)==8) && (isCC == 1)) modee = 13; //CC Glashow RES
+    if((abs(mode)==6) && (isCC == 1)) modee = 14;//CC IMD Annihalation 
    
+    if((abs(mode)==0) && (isCC == 0)) modee = 15; //NCQE
+    if((abs(mode)==2) && (isCC == 0)) modee = 16; //NC DIS
+    if((abs(mode)==1) && (isCC == 0)) modee = 17; //NC RES
+    if((abs(mode)==3) && (isCC == 0)) modee = 18; //NC COH
+    if((abs(mode)==11) && (isCC == 0)) modee = 19; //NC Diffractive
+    if((abs(mode)==5) && (isCC == 0)) modee = 20; //NC Electron scattering
+    if((abs(mode)==9) && (isCC == 0)) modee = 21; //NC AMnuGamma
+    if((abs(mode)==10) && (isCC == 0)) modee = 22; //NC MEC
+    if((abs(mode)==4) && (isCC == 0)) modee = 23; //NC COH Elastic
+    if((abs(mode)==7) && (isCC == 0)) modee = 24; // NC IBD
+    if((abs(mode)==8) && (isCC == 0)) modee = 25; //NC Glashow RES
+    if((abs(mode)==6) && (isCC == 0)) modee = 26;//NC IMD Annihalation 
+    
     if(modee == -999) std::cout << "unknown mode" << abs(mode) << std::endl;
 
 	if(TMath::IsNaN(erec) || erec < 0){
@@ -104,41 +114,46 @@ void XsecVary::MakeVariations()
       for(unsigned k = 0; k < systematicProperties[i].intModes.size(); k++)
       {
         // is this event one of these modes?
-        if(systematicProperties[i].intModes[k] == modee)
-        {
-          // loop over all knots
-          for(int j = 0 ; j < systematicProperties[i].GetWeightArray()->GetSize(); j++)
+        //if(systematicProperties[i].intModes[k] == modee)
+        //{
+          // Does this event pass the FD Fiducial Volume cut?
+          if(IsInFDFV(vtx_x, vtx_y, vtx_z))
           {
+            // loop over all knots
+            for(int j = 0 ; j < systematicProperties[i].GetWeightArray()->GetSize(); j++)
+            {
             // fill the histogram
-            dev_tmp[sysMode+k][j]->Fill(pnu[0],erec,wgtflx*wgtosc*systematicProperties[i].GetWeightArray()->At(j));
-            //std::cout << "BinContent: " << dev_tmp[sysMode+k][j]->FindBin(pnu[0], erec) << std::endl;
-            //if(systematicProperties[i].GetWeightArray()->At(j) != 1) {std::cout << "Event: " << jentry << " || for Systematic: " << systematicProperties[i].shortName.c_str() <<  "  ||  Mode: "  << modee  << " || The knot value is: " << systematicProperties[i].GetWeightArray()->At(j) << std::endl;}
-            //std::cout << "Osc Weight = " << wgtosc << std::endl;
-            dev_tmp[sysMode+k][j]->Fill(pnu[0],erec,wgtflx*systematicProperties[i].GetWeightArray()->At(j));
-	    if(TMath::IsNaN(pnu[0])){
-	      std::cout << "pnu[0]" << pnu[0] << std::endl;
-	    } 
+	      dev_tmp[sysMode+k][j]->Fill(pnu[0],erec,wgtflx*berpacv*systematicProperties[i].GetWeightArray()->At(j));
+            
+              // Check which modes have reponses for each systematic
+              std::string loopname;
+              char lloopname[100];
+              sprintf(lloopname,"%s",systematicProperties[i].shortName.c_str());
+              loopname = lloopname;
+              if((systematicProperties[i].GetWeightArray()->At(j) != 1) & (systematicProperties[i].shortName.c_str() ==systematicProperties[12].shortName.c_str()  || loopname == "empty"|| loopname == "empty")) {std::cout << "Event: " << jentry << " || for Systematic: " << systematicProperties[i].shortName.c_str() <<  "  ||  Mode: "  << modee  << " || CC/NC: " << isCC << " || The knot value is: " << systematicProperties[i].GetWeightArray()->At(j) << std::endl;}
+            
 
-	    double www = wgtflx*wgtosc*systematicProperties[i].GetWeightArray()->At(j);
-		//std::cout << "erec is " << erec << std::endl;
-		//std::cout << "Pnu is " << pnu[0] << std::endl;
-		//std::cout << "costheta is " << LepCosTh << std::endl;
-	    //double www = wgtflx*systematicProperties[i].GetWeightArray()->At(j);
+              //std::cout << "Osc Weight = " << wgtosc << std::endl;
+	      if(TMath::IsNaN(systematicProperties[i].GetWeightArray()->At(j))){
+	        std::cout << "Spooky weight: " << systematicProperties[i].GetWeightArray()->At(j) << std::endl;
+	      } 
+
+	    double www = wgtflx*systematicProperties[i].GetWeightArray()->At(j);
 		//std::cout << "www is " << www << std::endl;
 		//std::cout << "wgtflux " << wgtflx << ", xsec_weight " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[0]: " << pnu[0] << ", Erec: " << erec << ", mode: " << mode << std::endl;
 	    if(TMath::IsNaN(www) || www < 0){
-		  std::cout << "Sys: "<<  systematicProperties[i].shortName.c_str() <<  "  weight " << www << ", wgtflux " << wgtflx << ", wgtosc " << wgtosc << ", xsec_weight " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[0]: " << pnu[0] << ", Erec: " << erec << ", mode: " << mode << std::endl;
+		 std::cout << "Sys: "<<  systematicProperties[i].shortName.c_str() <<  "  weight " << www << ", wgtflux " << wgtflx << ", wgtosc " << wgtosc << ", xsec_weight " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[0]: " << pnu[0] << ", Erec: " << erec << ", mode: " << mode << std::endl;
 	    }
-		 //if(systematicProperties[i].GetWeightArray()->At(j)> 1.0 || systematicProperties[i].GetWeightArray()->At(j)< 1.0 ){std::cout << "mode is " << modee << " and weight is " << systematicProperties[i].GetWeightArray()->At(j) << std::endl;}
           }
         }
       }
+    //}
+ 
       sysMode += systematicProperties[i].intModes.size();
     }
   } // event loop
-
   int sysMode = 0;
-
+  
   // loop over all systematics:
   for(unsigned i = 0; i < systematicProperties.size(); i++)
   {
@@ -177,7 +192,6 @@ void XsecVary::MakeVariations()
           iter++;
         }
       }
-      int counter = 0;
       // fill the graphs with at the supplied (from the weight file) knot locations
       for(int a = 0; a < systematicProperties[i].GetKnotArray()->GetSize(); a++)
       {
@@ -188,15 +202,13 @@ void XsecVary::MakeVariations()
             
             //std::cout << "Bin Number: " << dev_tmp[sysMode+k][a]->GetNbinsY() << std::endl;
             int nom = systematicProperties[i].nominalPosition;
+            
             graphs[sysMode+k][l][j]->SetPoint(iter,systematicProperties[i].GetKnotArray()->At(a),
                                                (dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1) > 0. ?
                                                 dev_tmp[sysMode+k][a]->GetBinContent(l+1,j+1)/
-                                                dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1)  :  1.));
-            
-            //if (dev_tmp[sysMode+k][a]->GetBinContent(l+1,j+1) != 0) {std::cout << "Value:"  << dev_tmp[sysMode+k][a]->GetBinContent(l+1,j+1) << "|| Bin number : " << l+1 << " , "  << j+1 << std::endl;
-            counter++;
-
- 
+                                                dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1)  
+                                                :  1.));
+            if(i==30 && k == 0 && dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1)!=0 && l == 16 && j == 16) {std::cout <<  " Sys Name: " << systematicProperties[30].shortName.c_str() << "Value of Nom at Knot " << a << " for bins: " << l+1  << " , "  << j+1  << " is: " << dev_tmp[sysMode+k][a]->GetBinContent(l+1,j+1) << "  Value of Den: " << dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1) << std::endl;}
             if(TMath::IsNaN((dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1))) || dev_tmp[sysMode+k][nom]->GetBinContent(l+1,j+1) < 0){
 	      std::cout << "ERROR: is nan at nom: " << nom << std::endl;
 	    }
@@ -207,7 +219,7 @@ void XsecVary::MakeVariations()
 
           }
         }
-        //if (a == 0) {std::cout << "Total bins with stuff " << counter << std::endl;}
+        if (a == systematicProperties[i].nominalPosition ) {std::cout << "For Sys: " << systematicProperties[i].shortName.c_str() << "  for event mode: " << k <<  "  the nom bin with the most stuff = " << dev_tmp[sysMode+k][a]->GetBinContent(dev_tmp[sysMode+k][a]->GetMaximumBin())/dev_tmp[sysMode+k][a]->GetBinContent(dev_tmp[sysMode+k][a]->GetMaximumBin()) << std::endl;}
         iter++;
       }
 
@@ -327,7 +339,7 @@ void XsecVary::WriteGraphs(std::string outputname){
   int rwbin = 0;
 
   //std::string modeToName[] = {"ccqe","ccqe","cccoh","ccmisc","ncpiz","ncpipm","nccoh","ncoth","mec", "nc1gamma", "ccmpi", "ccdis"};//ETA adding ccmpi and ccdis for the 2020OA
-	std::string modeToName[] = {"qe", "mec", "dis", "res", "coh", "diff", "nueel", "unknown", "amnugamma", "unknown", "cohel", "ibd", "glasres", "imdannihilation"};
+	std::string modeToName[] = {"ccqe", "ccmec", "ccdis", "ccres", "cccoh", "ccdiff", "ccnueel", "unknown", "ccamnugamma", "unknown", "cccohel", "ccibd", "ccglasres", "ccimdannihilation", "ncqe", "ncdis", "ncres", "nccoh", "ncdiff", "ncnueel", "ncamnugamma", "ncmec", "nccohel", "ncibd", "ncglasres", "ncimdannihilation"};
 
   for(unsigned a = 0; a < systematicProperties.size(); a++)
   {
