@@ -19,6 +19,8 @@
 #include <TMath.h>
 #include <string>
 
+typedef Double_t FLOAT_T;
+
 class SystematicProperties
 {
   public:
@@ -43,12 +45,19 @@ class SystematicProperties
     // in order to keep splines flat(ish) outside this range? e.g. pfo in 2017/18 OA
     bool addKnots;
 
+    //If true, the spline weights will be normalized by the event weight. Should be used for GENIEReweight systs
+    bool reweight;
+
+    //Index of the corresponding syst in the ifile
+    int syst_idx;
+
     TBranch* weightBranch;
     TBranch* knotBranch;
 
     // constructor
     SystematicProperties(std::string name, std::string sname, std::vector<int> modes, int nomLoc);
     SystematicProperties(std::string name, std::string sname, std::vector<int> modes, int nomLoc, bool add);
+    SystematicProperties(std::string name, std::string sname, std::vector<int> modes, int nomLoc, bool add, bool reweight=false);
 
     // getters
     const TArrayF * GetWeightArray();
@@ -82,7 +91,7 @@ class XsecVary {
     // Input file containing weights, properly formatted   
     std::string               weightFile;
     std::vector< TChain* >    fChain_weights;
-    Int_t                     fCurrent_w;
+    Int_t                     fCurrent_w = 0;
     std::vector< TArrayF* >   weightArrays;
     std::vector< TArrayF* >   knotArrays;
     std::vector< TBranch* >   weightBranches;
@@ -95,6 +104,7 @@ class XsecVary {
     // Declaration of leaf types: fChain
     //Double_t        erec;
     Double_t        wgtflx;
+    Double_t        wgtxsec;
     Double_t        wgtosc;
     //Float_t         wgtosc;
     Float_t         dir[10][3];
@@ -108,8 +118,8 @@ class XsecVary {
 	Float_t         fqmome; //Single ring reco electron mom
     Int_t           numnu;
     Int_t           mode;
-    Int_t           ipnu[50];
-    Double_t         pnu[50];
+    Int_t           ipnu;
+    FLOAT_T         pnu;
     
     // List of branches: fChain
     TBranch        *b_iclass;   //!
@@ -121,23 +131,24 @@ class XsecVary {
     
 
   //DUNE VARIABLES FD
-    Double_t        erec_numu;
-    Double_t        erec_nue;
-    Double_t        cvnnumu;
-    Double_t        cvnnue;
+    FLOAT_T        erec_numu;
+    FLOAT_T        erec_nue;
+    FLOAT_T        cvnnumu;
+    FLOAT_T        cvnnue;
     Int_t           isCC;
-    Double_t        vtx_x;
-    Double_t        vtx_y;
-    Double_t        vtx_z;
-    Double_t        berpacv;
+    FLOAT_T        vtx_x;
+    FLOAT_T        vtx_y;
+    FLOAT_T        vtx_z;
+    FLOAT_T        berpacv;
+    std::vector<std::vector<float>> *weightVec;
 
     // Declaration of leaf types: fTree_byEv
-    Float_t         Etrue;
-    Float_t         Erec_check;
+    FLOAT_T         Etrue;
+    FLOAT_T         Erec_check;
   
   
     // Vectors of splines, graphs, and histograms
-    std::vector< std::vector< TH2F* > > dev_tmp;
+    std::vector< std::vector< TH3F* > > dev_tmp;
     std::vector< std::string >          dev_tmp_names;
     std::vector< std::vector< std::vector< TSpline3*  >  >  > splines;
     std::vector< std::vector< std::vector< TGraph*  >  >  >   graphs;
@@ -147,6 +158,7 @@ class XsecVary {
     int SampleType;
   
     XsecVary(std::string weight_file, std::string kinematics_file, std::vector<SystematicProperties> systProps, int sampletype=3); 
+    XsecVary(std::string sum_file, std::vector<SystematicProperties> systProps, int sampletype=3);
     virtual ~XsecVary();
     virtual Int_t    GetEntry(Long64_t entry);
     virtual Int_t    GetEntries();
@@ -164,277 +176,5 @@ class XsecVary {
 
 #endif
 
-#ifdef XsecVary_cxx
-XsecVary::XsecVary(std::string weight_file, std::string kinematics_file, std::vector<SystematicProperties> systProps, int sampletype)
-{ 
-  std::cout << "XsecVary constructor with sampletype = " << sampletype << std::endl;
-  // Set SampleType (should be 0 for nue or 1 for numu)
-  SampleType = sampletype;
-
-  systematicProperties = systProps;
-
-  weightFile = weight_file;
-
-  fChain = new TChain("caf");//h1/mtuple/minituple
-  if(fChain)   fChain->Add(kinematics_file.c_str());
-  if(fChain->GetEntries()==0)
-  {
-    std::cout << "Looking for tree 'h1' instead." << std::endl;
-    fChain = new TChain("h1");
-    if(fChain)   fChain->Add(kinematics_file.c_str());
-  }
-  if(fChain->GetEntries()==0)
-  {
-    std::cout << "Looking for tree 'minituple' instead." << std::endl;
-    fChain = new TChain("minituple");
-    if(fChain)   fChain->Add(kinematics_file.c_str());
-  }
-
-  Init();
-
-  AddSystematics(systematicProperties);
-
-}
-
-XsecVary::~XsecVary()
-{
-   //if (!fChain_w_NXSec_MaCCQE || !fChain) return;
-   if (!fChain_weights.at(0) || !fChain) return;
-   if(fChain_weights.at(0)) delete fChain_weights.at(0)->GetCurrentFile();
-   if(fChain) delete fChain->GetCurrentFile();
-
-   std::cout << "Deleting splines " << std::endl;
-   for(unsigned i = 0; i < splines.size(); i++)
-   {
-     for(unsigned j = 0; j < splines[i].size(); j++)
-     {
-       for(unsigned k = 0; k < splines[i][j].size(); k++)
-       {
-         if(splines[i][j][k]) splines[i][j][k]->Delete();
-       }
-     }
-   }
-
-   std::cout << "Deleting graphs " << std::endl;
-   for(unsigned i = 0; i < graphs.size(); i++)
-   {
-     for(unsigned j = 0; j < graphs[i].size(); j++)
-     {
-       for(unsigned k = 0; k < graphs[i][j].size(); k++)
-       {
-         if(graphs[i][j][k]) graphs[i][j][k]->Delete();
-       }
-     }
-   }
-
-   std::cout << "Deleting histograms " << std::endl;
-   for(unsigned i = 0; i < dev_tmp.size(); i++)
-   {
-     for(unsigned j = 0; j < dev_tmp[i].size(); j++)
-     {
-       if(dev_tmp[i][j]) dev_tmp[i][j]->Delete();
-     }
-   }
-
-}
-
-SystematicProperties::SystematicProperties(std::string name, std::string sname, std::vector<int> modes, int nomLoc)
-{
-  systName          = name;
-  shortName         = sname;
-  intModes          = modes;
-  nominalPosition   = nomLoc;
-  addKnots          = false;  // default
-}
-
-SystematicProperties::SystematicProperties(std::string name, std::string sname, std::vector<int> modes, int nomLoc, bool add)
-{
-  systName          = name;
-  shortName         = sname;
-  intModes          = modes;
-  nominalPosition   = nomLoc;
-  addKnots          = add;
-}
-
-void SystematicProperties::SetBranches(TBranch* wbranch, TBranch* kbranch)
-{
-  weightBranch = wbranch;
-  knotBranch   = kbranch;
-}
-
-void SystematicProperties::SetArrays(TArrayF* warr, TArrayF* karr)
-{
-  weightArray = warr;
-  knotArray   = karr;
-}
-
-const TArrayF * SystematicProperties::GetWeightArray(){return weightArray;}
-const TArrayF * SystematicProperties::GetKnotArray(){return knotArray;}
-
-Int_t XsecVary::GetEntry(Long64_t entry)
-{
-// Read contents of entry.
-   if (!fChain) return 0;
-   return fChain->GetEntry(entry);
-}
-
-Int_t XsecVary::GetEntries()
-{
-  // Return number of entries in tree
-  if (!fChain) return 0;
-  return fChain->GetEntries();
-}
-
-void XsecVary::AddSystematics(std::vector<SystematicProperties> &systProps)
-{
-  // Fill vectors before setting branch addresses, because the vectors will reallocate memory
-  // while being filled. We need to know the final address to read in the weight file
-  int numSysts = systProps.size();
-  for(int i = 0; i < numSysts; i++)
-  {
-
-    std::string sysName      = systProps[i].systName;
-    std::string sysTreeName  = sysName + "_tree";
-
-   // std::cout << sysTreeName << std::endl;
-
-    TArrayF *tempWeightsArr = 0;
-    TArrayF *tempKnotsArr = 0;
-    TBranch *tempWeightsBranch = 0;
-    TBranch *tempKnotsBranch   = 0;
-    TChain  *tempChain = new TChain(sysTreeName.c_str());
-    tempChain->Add(weightFile.c_str());
-    fChain->AddFriend(sysTreeName.c_str(),weightFile.c_str());
-    sysNames.push_back(sysName);
-    weightArrays.push_back(tempWeightsArr);
-    knotArrays.push_back(tempKnotsArr);
-    weightBranches.push_back(tempWeightsBranch);
-    knotBranches.push_back(tempKnotsBranch);
-    fChain_weights.push_back(tempChain);
-
-    // Set the arrays to read in the weight file.
-    systProps[i].SetArrays(tempWeightsArr, tempKnotsArr);
-   
-  }
-
-
-  int numSplines = 0;
-
-  // Now set the branch addresses.
-  for(int j = 0; j < numSysts; j++)
-  {
-    std::string weightBrName = sysNames.at(j) + "_weights";
-    std::string knotBrName   = sysNames.at(j) + "_knots";
-
-    systProps[j].weightArray  = 0;
-    systProps[j].knotArray    = 0;
-    systProps[j].weightBranch = 0;
-    systProps[j].knotBranch   = 0;
-  
-    fChain->SetBranchAddress(weightBrName.c_str(),&(systProps[j].weightArray),&(systProps[j].weightBranch));
-    fChain->SetBranchAddress(knotBrName.c_str(),&(systProps[j].knotArray),&(systProps[j].knotBranch));
-  
-    numSplines += systProps[j].intModes.size();
-
-  }
-
-  // Set up the histogram vector:
-  dev_tmp.resize(numSplines);
-  fChain->GetEntry(0);
-  unsigned int itty = 0;
-  //std::string modeToName[] = {"ccqe","cc1pi","cccoh","ccmisc","ncpiz","ncpipm","nccoh","ncoth","mec", "nc1gamma", "ccmpi", "ccdis"};//ETA adding ccmpi and ccdis for 2020OA, ccoth now ccmisc also was nc1gamma missing??
-  std::string modeToName[] = {"ccqe", "ccmec", "ccdis", "ccres", "cccoh", "ccdiff", "ccnueel", "unknown", "ccamnugamma", "unknown", "cccohel", "ccibd", "ccglasres", "ccimdannihilation", "ncqe", "ncmec", "ncdis", "ncres", "nccoh", "ncdiff", "ncnueel", "ncamnugamma", "nccohel", "ncibd", "ncglasres", "ncimdannihilation"};
-
-  for(int k = 0; k < numSysts; k++)
-  {
-    for(unsigned l = 0; l < systProps[k].intModes.size(); l++)
-    {
-      //std::cout << systProps[k].weightArray << std::endl;
-      dev_tmp[itty].resize(systProps[k].GetKnotArray()->GetSize());
-      itty++;
-      char tmpname[1000];
-      sprintf(tmpname,"dev_%s_%s",systProps[k].shortName.c_str(),modeToName[systProps[k].intModes[l]-1].c_str());
-      dev_tmp_names.push_back(std::string(tmpname));
-    }
-  }
-
-}
-
-Long64_t XsecVary::LoadTree(Long64_t entry)
-{
-// Set the environment to read one entry
-   if (!fChain) return -5;
-   Long64_t centry = fChain->LoadTree(entry);
-   if (centry < 0) return centry;
-   if (!fChain->InheritsFrom(TChain::Class()))  return centry;
-   TChain *chain = (TChain*)fChain;
-   if (chain->GetTreeNumber() != fCurrent_w) { // check this part, currently matches k
-     //if (chain->GetTreeNumber() != fCurrent) {
-     fCurrent = chain->GetTreeNumber(); 
-     Notify();
-   }
-   return centry;
-}
-
-
-void XsecVary::Init()
-{
-  // The Init() function is called when the selector needs to initialize
-  // a new tree or chain. Typically here the branch addresses and branch
-  // pointers of the tree will be set.
-  // It is normally not necessary to make changes to the generated
-  // code, but the routine can be extended by the user if needed.
-  // Init() will be called many times when running on PROOF
-  // (once per file to be processed).
-
-  // Note that for the for the weight chain, this is done in AddSystematics()
-
-  // Set branch addresses and branch pointers
-  fCurrent = -1;
-  fChain->SetMakeClass(1);
-
-
-  // DUNE FD CAF Variables
-  fChain->SetBranchAddress("cvnnumu", &cvnnumu);
-  fChain->SetBranchAddress("cvnnue", &cvnnue);
-  fChain->SetBranchAddress("Ev_reco_numu", &erec_numu);
-  fChain->SetBranchAddress("Ev_reco_nue", &erec_nue);
-  fChain->SetBranchAddress("nuPDG", ipnu, &b_ipnu);
-  fChain->SetBranchAddress("Ev", pnu, &b_pnu);
-  fChain->SetBranchAddress("mode", &mode, &b_mode);
-  fChain->SetBranchAddress("wgtosc", &wgtosc);
-  fChain->SetBranchAddress("isCC", &isCC);
-  fChain->SetBranchAddress("vtx_x", &vtx_x);
-  fChain->SetBranchAddress("vtx_y", &vtx_y);
-  fChain->SetBranchAddress("vtx_z", &vtx_z);
-  fChain->SetBranchAddress("BeRPA_A_cvwgt", &berpacv);
-  Notify();
-}
-
-Bool_t XsecVary::Notify()
-{
-   // The Notify() function is called when a new file is opened. This
-   // can be either for a new TTree in a TChain or when when a new TTree
-   // is started when using PROOF. It is normally not necessary to make changes
-   // to the generated code, but the routine can be extended by the
-   // user if needed. The return value is currently not used.
-
-   return kTRUE;
-}
-
-void XsecVary::Show(Long64_t entry)
-{
-// Print contents of entry.
-// If entry is not specified, print current entry
-   if (!fChain) return;
-   fChain->Show(entry);
-}
-
-//DUNE FD FV cut
-inline bool IsInFDFV(double pos_x_cm, double pos_y_cm, double pos_z_cm) 
-{
-  return (abs(pos_x_cm) < 310 && abs(pos_y_cm) < 550 && pos_z_cm > 50 && pos_z_cm < 1244);
-}
-
-
-#endif // #ifdef XsecVary_cxx
+// #ifdef XsecVary_cxx
+// #endif // #ifdef XsecVary_cxx
