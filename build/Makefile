@@ -8,9 +8,9 @@ OBJDIR = $(HERE)/.obj
 DEPDIR = $(HERE)/.dep
 EXEDIR = $(HERE)/bin
 
-LOCAL_INC = -I$(HERE)/src_lib -I$(HERE)/src_bin
-vpath % $(HERE)/src_lib
-vpath % $(HERE)/src_bin
+LOCAL_INC = -I$(HERE)/../src_lib -I$(HERE)/../src_bin -I/vols/dune/nk3717/duneanaobj_build/build/install/include 
+vpath % $(HERE)/../src_lib
+vpath % $(HERE)/../src_bin
 
 #
 # Set up compiler and flags
@@ -22,7 +22,7 @@ CC_FLAGS  = $(OPT) -Wall -Werror `root-config --cflags` -fPIC $(LOCAL_INC)
 ROOT_LIBS  = `root-config --libs` -lMinuit
 
 LIB_FLAGS = $(LD_FLAGS) $(ROOT_LIBS) -shared 
-EXE_FLAGS = $(LD_FLAGS) $(ROOT_LIBS) $(LOCAL_LIBS) -Iinclude/ 
+EXE_FLAGS = $(LD_FLAGS) $(ROOT_LIBS) $(LOCAL_LIBS) -Iinclude/
 
 #
 # Debug or Optimized
@@ -34,12 +34,14 @@ OPT = -g
 #
 # Define library and executable source files
 #
-LIB        = $(LIBDIR)/libXsecVary.so
-SRCS       = $(wildcard src_lib/*.cc)
-EXESRCS    = $(wildcard src_bin/*.cc)
+#LIB        = $(LIBDIR)/libXsecVary1D_NDGAr.so
+LIB        = $(LIBDIR)/libXsecVary2D_NDGAr.so
+SRCS       = $(wildcard ../src_lib/*.cc)
+EXESRCS    = $(wildcard ../src_bin/*.cc)
 
 # Make sure the executables can find the library above
-LOCAL_LIBS = -L$(LIBDIR) -lXsecVary
+#LOCAL_LIBS = -L$(LIBDIR) -lXsecVary1D_NDGAr -L/vols/dune/nk3717/duneanaobj_build/build/install/lib -lduneanaobj_StandardRecord
+LOCAL_LIBS = -L$(LIBDIR) -lXsecVary2D_NDGAr -L/vols/dune/nk3717/duneanaobj_build/build/install/lib -lduneanaobj_StandardRecord
 
 
 

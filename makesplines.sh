@@ -22,19 +22,20 @@
 
 declare -i i=0
 
-for entry in $(ls ../m3_dune/inputs/mtuples/GenieSampleCuts/*); 
+for entry in $(ls ../../data/NDGAr_testCAFs/*numuselec.root); 
 do
   declare -i j=0
-  for entry2 in $(ls ../m3_dune/inputs/mtuples/WeightFiles/*); 
+  for entry2 in $(ls ../../data/NDGAr_testCAFs/Weights/*numuselec_weight.root); 
   do
     infile=${entry##*/}
-    outfile2=${infile%.root}"_splines.root"
-    outfile3="./SplineOutputs/"${infile%.root}"_splines.txt"
-    com3="./bin/make_xsec_response_1d -w ${entry2} -m ${entry} -o ${outfile2} -selec numu &> ${outfile3} &"
+    outfile2="../../data/NDGAr_testCAFs/SplineOutputs/"${infile%.root}"_2dsplines.root"
+    outfile3="../../data/NDGAr_testCAFs/SplineOutputs/"${infile%.root}"_2dsplines.txt"
+#    com3="./build/bin/make_xsec_response_1d_NDGAr -w ${entry2} -m ${entry} -o ${outfile2} -selec numu &> ${outfile3} &"
+    com3="./build/bin/make_xsec_response_2d_NDGAr -w ${entry2} -m ${entry} -o ${outfile2} &> ${outfile3} "
     if [ $i == $j ]
     then
       eval ${com3}
-      sleep 1m; 
+#      sleep 1m; 
     fi
     ((j++))
   done
