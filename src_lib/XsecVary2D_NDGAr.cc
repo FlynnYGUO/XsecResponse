@@ -291,6 +291,7 @@ void XsecVary2D_NDGAr::MakeVariations()
           std::cout<<"a = "<<a<<", b = "<<b<<", c ="<<c<<", d = "<<d<<" max d = "<<dev_tmp[a][0]->GetNbinsZ()<<std::endl;
           sprintf(sname,"%s_sp_%d_%d_%d",dev_tmp_names[a].c_str(),b,c,d);
           std::cout<<"N: "<<graphs[a][b][c][d]->GetN()<<" X mean: "<<graphs[a][b][c][d]->GetMean(1)<<" Y mean: "<<graphs[a][b][c][d]->GetMean(2)<<std::endl;         
+          std::cout<<"sname: "<<sname<<std::endl;
           tmp_zbin = new TSpline3(sname,graphs[a][b][c][d]);
           tmp_ybin.push_back(tmp_zbin);
         }
@@ -308,14 +309,21 @@ void XsecVary2D_NDGAr::MakeVariations()
 // Etrue-Erec binning (used for splines)
 void XsecVary2D_NDGAr::SetBinning(const Double_t *ebins, Int_t nebins, const Double_t *rebins, Int_t nrebins,const Double_t* qsqdbins, Int_t nqsqdbins)
 {
-
+  std::cout<<"SetBinning"<<std::endl;
   for(unsigned i=0; i<dev_tmp.size(); i++)
   {
     char hname[1000];
     for(unsigned j=0; j<dev_tmp[i].size(); j++)
-    {
+    { 
       sprintf(hname,"dev_tmp_%d_%d",j,i);
+      std::cout<<"dev_tmp_"<<j<<"_"<<i<<" nebins: "<<nebins<<" ebins: "<<*ebins<<" nrebins: "<<nrebins<<" rebins: "<<*rebins<<" nqsqdbins: "<<nqsqdbins<< "qsqdbins: "<<*qsqdbins<<std::endl;
       dev_tmp[i][j] = new TH3F(hname,hname,nebins,ebins,nrebins,rebins,nqsqdbins,qsqdbins);
+      const double *netrue = dev_tmp[i][j]->GetXaxis()->GetXbins()->GetArray();
+      std::cout<<"netrue bins: "<<netrue[0]<<" "<<netrue[4]<<std::endl;
+      const double *nerec = dev_tmp[i][j]->GetYaxis()->GetXbins()->GetArray();
+      std::cout<<"netrue bins: "<<nerec[0]<<" "<<nerec[4]<<std::endl;
+      const double *nyrec = dev_tmp[i][j]->GetZaxis()->GetXbins()->GetArray();
+      std::cout<<"netrue bins: "<<nyrec[0]<<" "<<nyrec[4]<<std::endl;
     } 
   }
 
@@ -374,7 +382,7 @@ void XsecVary2D_NDGAr::WriteGraphs(std::string outputname){
             char grname[50];
             sprintf(grname,"dev_%s_%s_gr_%d_%d_%d",systematicProperties[a].shortName.c_str(),modeToName[systematicProperties[a].intModes[b]-1].c_str(),i,j,k);
             graphs[rwbin+b][i][j][k]->Write(grname);
-//            graphs[rwbin+b][i][j][k]->Delete();
+            graphs[rwbin+b][i][j][k]->Delete();
           }
 		} 
       } 
@@ -395,9 +403,17 @@ void XsecVary2D_NDGAr::WriteGraphs(std::string outputname){
         {
           for(unsigned k = 0; k < (unsigned)splines[rwbin+b][i][j].size(); k++)
           {
-            char spname[50];
+            char spname[1000];
             sprintf(spname,"dev_%s_%s_sp_%d_%d_%d",systematicProperties[a].shortName.c_str(),modeToName[systematicProperties[a].intModes[b]-1].c_str(),i,j,k);
+            //std::cout<<"a: "<<a<<" b: "<<b<<" i: "<<i<<" j: "<<j<<" k: "<<k<<std::endl;
+            //std::cout<<"spname: "<<spname<<std::endl;
+            //std::string problem = "dev_thetadelta_ccres_sp_0_5_4";
+            //if(spname == problem){std::cout<< "here"<<std::endl; splines[rwbin+b][i+1][j][k]->Write(spname); continue;}
+            if(splines[rwbin+b][i][j][k]){ 
             splines[rwbin+b][i][j][k]->Write(spname);
+            splines[rwbin+b][i][j][k]->Delete();
+            }
+            else {std::cout<<"spname: "<<spname<<" NO SPLINE"<<std::endl;}
           }
         }
       }

@@ -219,7 +219,7 @@ XsecVary2D_NDGAr::~XsecVary2D_NDGAr()
   if (!fChain_weights.at(0) || !fChain) return;
   if(fChain_weights.at(0)) delete fChain_weights.at(0)->GetCurrentFile();
   if(fChain) delete fChain->GetCurrentFile();
-
+/*
   std::cout << "Deleting splines " << std::endl;
   for(unsigned i = 0; i < splines.size(); i++)
   {
@@ -249,7 +249,7 @@ XsecVary2D_NDGAr::~XsecVary2D_NDGAr()
       }
     }
   }
-
+*/
   std::cout << "Deleting histograms " << std::endl;
   for(unsigned i = 0; i < dev_tmp.size(); i++)
   {

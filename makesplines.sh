@@ -31,10 +31,13 @@ do
     outfile2="../../data/NDGAr_testCAFs/SplineOutputs/"${infile%.root}"_2dsplines.root"
     outfile3="../../data/NDGAr_testCAFs/SplineOutputs/"${infile%.root}"_2dsplines.txt"
 #    com3="./build/bin/make_xsec_response_1d_NDGAr -w ${entry2} -m ${entry} -o ${outfile2} -selec numu &> ${outfile3} &"
-    com3="./build/bin/make_xsec_response_2d_NDGAr -w ${entry2} -m ${entry} -o ${outfile2} &> ${outfile3} "
+    com3="./build/bin/make_xsec_response_2d_NDGAr -w ${entry2} -m ${entry} -o ${outfile2} &> ${outfile3} &"
     if [ $i == $j ]
     then
       eval ${com3}
+      sleep 2s
+#      pid=$!
+#      wait $pid
 #      sleep 1m; 
     fi
     ((j++))

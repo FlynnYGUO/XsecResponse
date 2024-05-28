@@ -12,7 +12,8 @@ export LD_LIBRARY_PATH=$PWD/build/lib:/vols/dune/nk3717/duneanaobj_build/build/i
 #SETUP CMAKE AND ROO FROM CVMFS
 source /cvmfs/dune.opensciencegrid.org/products/dune/setup_dune.sh    
 setup cmake v3_19_6
-setup root v6_18_02a -q e17:prof
+setup root v6_18_04 -q e17:prof
+#setup root v6_18_02a -q e17:prof
 #setup cmake v3_12_2 -f Linux64bit+3.10-2.17
 #setup root v6_18_02a -f Linux64bit+3.10-2.17 -q e17:prof
 export CXX=`which g++` # this might be specific for Fermilab?

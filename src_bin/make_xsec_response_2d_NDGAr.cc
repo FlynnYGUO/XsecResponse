@@ -327,24 +327,36 @@ int main(int argc, char *argv[])
 	// in the file
 	xs.GetEntry(0);
 
-	const int ebins = recoe_temps_etru[0]->GetXaxis()->GetNbins();
-    const Double_t *ebinrange = recoe_temps_etru[0]->GetXaxis()->GetXbins()->GetArray();
+//	const int ebins = recoe_temps_etru[0]->GetXaxis()->GetNbins();
+//    const Double_t *ebinrange = recoe_temps_etru[0]->GetXaxis()->GetXbins()->GetArray();
+        const int ebins = 6;
+        const Double_t ebinvals[] = {0., 0.5, 1, 1.75, 2.5, 5., 10.}; 
+        const Double_t *ebinrange = &ebinvals[0];
 	std::cout << "Number of true energy bins: " << ebins << "." << std::endl;
 	std::cout << "True energy bins: {";
 	for (int ibin=0; ibin<ebins; ibin++)
 	  std::cout << ebinrange[ibin] << ", ";
 	std::cout << ebinrange[ebins] << "}" << std::endl;
 	
-	const int rebins = recoe_temps_erec[0]->GetXaxis()->GetNbins();
-	const Double_t *rebinrange = recoe_temps_erec[0]->GetXaxis()->GetXbins()->GetArray();
+//	const int rebins = recoe_temps_erec[0]->GetXaxis()->GetNbins();
+//	const Double_t *rebinrange = recoe_temps_erec[0]->GetXaxis()->GetXbins()->GetArray();
+        const int rebins = 10;
+        const Double_t rebinvals[] = {0., 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.}; 
+        const Double_t *rebinrange = &rebinvals[0];
+
+
     std::cout << "Number of reco energy bins: " << rebins << "." << std::endl;
 	std::cout << "Reco energy bins: {";
 	for (int ibin=0; ibin<rebins; ibin++)
 	  std::cout << rebinrange[ibin] << ", ";
 	std::cout << rebinrange[rebins] << "}" << std::endl;
  
-	const int rybins = recoe_temps_yrec[0]->GetXaxis()->GetNbins();
-    const Double_t *rybinrange = recoe_temps_yrec[0]->GetXaxis()->GetXbins()->GetArray();
+//	const int rybins = recoe_temps_yrec[0]->GetXaxis()->GetNbins();
+//    const Double_t *rybinrange = recoe_temps_yrec[0]->GetXaxis()->GetXbins()->GetArray();
+        const int rybins = 5;
+        const Double_t rybinvals[] = {0., 0.1, 0.2, 0.4, 0.7, 1.1}; 
+        const Double_t *rybinrange = &rybinvals[0];
+
     std::cout << "Number of reco y bins: " << rybins << "." << std::endl;
 	std::cout << "Reco y bins: {";
 	for (int ibin=0; ibin<rybins; ibin++)
