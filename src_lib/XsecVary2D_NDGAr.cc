@@ -24,12 +24,41 @@ void XsecVary2D_NDGAr::MakeVariations()
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     fChain->GetEntry(jentry); 
-    double firstpar=0;
-    firstpar = (double)(sr->mc.nu[0].E);
-//    firstpar=erec_caf; // MeV
-	
+    double firstpar =0;
     double secondpar = 0;
-    secondpar = (double)((sr->mc.nu[0].E - sr->mc.nu[0].prim[0].p.E)/(sr->mc.nu[0].E));
+    if(sr->common.ixn.ngsft == 0){
+      firstpar = (double)(0);
+      secondpar = (double)(0);
+    }
+    else{
+      float erec_total =0;
+      float elep_reco =0;
+      int nixns = (int)(sr->common.ixn.ngsft);
+      float muonscore =0;
+      for(int i_ixn =0; i_ixn<nixns; i_ixn++){
+        int nrecoparticles = (int)(sr->common.ixn.gsft[i_ixn].part.ngsft);
+        for(int i_part =0; i_part<nrecoparticles; i_part++){
+          float erec_part = (float)(sr->common.ixn.gsft[i_ixn].part.gsft[i_part].E);
+          //int pdg_rec = (int)(sr->common.ixn.gsft[i_ixn].part[i_part].pdg);
+          erec_total+=erec_part;
+          if((float)(sr->common.ixn.gsft[i_ixn].part.gsft[i_part].score.gsft_pid.muon_score>muonscore)){
+            muonscore = (float)(sr->common.ixn.gsft[i_ixn].part.gsft[i_part].score.gsft_pid.muon_score);
+            elep_reco = erec_part;
+          }
+        }
+      } //ADD PRIMARY LEPTON ENERGY ELEP_RECO
+      firstpar = (double)(erec_total);
+      secondpar = (double)((erec_total - elep_reco)/(erec_total));
+    }
+
+//    double firstpar=0;
+//    firstpar = (double)(sr->mc.nu[0].E);
+//    firstpar=erec_caf; // MeV
+//
+    pnu[1]=(double)(sr->mc.nu[0].E);
+	
+//    double secondpar = 0;
+//    secondpar = (double)((sr->mc.nu[0].E - sr->mc.nu[0].prim[0].p.E)/(sr->mc.nu[0].E));
 	//Yrec
 //	secondpar = (erec_caf - elep_reco)/erec_caf;
 	//std::cout << "Etrue = " << pnu[1] << std::endl;
@@ -123,8 +152,8 @@ void XsecVary2D_NDGAr::MakeVariations()
       for(unsigned k = 0; k < systematicProperties[i].intModes.size(); k++)
       {
         // is this event one of these modes and does the event pass the selection cut
-//        if(systematicProperties[i].intModes[k] == modee && IsInNDFV(vtx_x, vtx_y, vtx_z) && IsCCInclusive(reco_numu, muon_contained, muon_tracker, Ehad_veto))
-//        {
+        if(systematicProperties[i].intModes[k] == modee)
+        {
           // loop over all knots
           for(int j = 0 ; j < systematicProperties[i].GetWeightArray()->GetSize(); j++)
           {
@@ -132,7 +161,7 @@ void XsecVary2D_NDGAr::MakeVariations()
             //dev_tmp[sysMode+k][j]->Fill(pnu[1],firstpar,secondpar,wgtflx*wgtosc*systematicProperties[i].GetWeightArray()->At(j));
             dev_tmp[sysMode+k][j]->Fill(pnu[1],firstpar,secondpar,wgtflx*wgtosc*berpacv*systematicProperties[i].GetWeightArray()->At(j));
 
-			//std::cout << "Event = " << jentry << " || Etrue = " << pnu[1] << "|| Erec = " << firstpar << " || Yrec = " << secondpar << " || WEIGHT = " << wgtflx*wgtosc*berpacv*systematicProperties[i].GetWeightArray()->At(j) << std::endl;
+	    std::cout << "Event = " << jentry << " || Etrue = " << pnu[1] << "|| Erec = " << firstpar << " || Yrec = " << secondpar << " || WEIGHT = " << wgtflx*wgtosc*berpacv*systematicProperties[i].GetWeightArray()->At(j) << std::endl;
 
 	    if(TMath::IsNaN(wgtflx*systematicProperties[i].GetWeightArray()->At(j))){
 	      std::cout << "weight" << wgtflx << ", " << wgtosc << ", " << systematicProperties[i].GetWeightArray()->At(j) << ", pnu[1]: " << pnu[1] << ", firstpar: " << firstpar << ", secondpar: " << secondpar << std::endl;
@@ -146,7 +175,7 @@ void XsecVary2D_NDGAr::MakeVariations()
 
 
           }
-//        }
+        }
       }
       sysMode += systematicProperties[i].intModes.size();
     }

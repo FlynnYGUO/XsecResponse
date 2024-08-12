@@ -8,18 +8,18 @@ OBJDIR = $(HERE)/.obj
 DEPDIR = $(HERE)/.dep
 EXEDIR = $(HERE)/bin
 
-LOCAL_INC = -I$(HERE)/../src_lib -I$(HERE)/../src_bin -I/vols/dune/nk3717/duneanaobj_build/build/install/include 
+LOCAL_INC = -I$(HERE)/../src_lib -I$(HERE)/../src_bin -I/vols/dune/nk3717/duneanaobj_build_v2CAFs//build/install/include 
 vpath % $(HERE)/../src_lib
 vpath % $(HERE)/../src_bin
-
+ROOTVERSION = $(shell root-config --version)
 #
 # Set up compiler and flags
 #
 CC        = g++
-LD_FLAGS  = `root-config --cflags` -fPIC -L$(LIBDIR) -Wl,-undefined,dynamic_lookup $(LOCAL_INC)
-CC_FLAGS  = $(OPT) -Wall -Werror `root-config --cflags` -fPIC $(LOCAL_INC)
+LD_FLAGS  = $(shell root-config --cflags) -fPIC -L$(LIBDIR) -Wl,-undefined,dynamic_lookup $(LOCAL_INC)
+CC_FLAGS  = $(OPT) -Wall -Werror $(shell root-config --cflags) -fPIC $(LOCAL_INC)
 
-ROOT_LIBS  = `root-config --libs` -lMinuit
+ROOT_LIBS  = $(shell root-config --libs) -lMinuit
 
 LIB_FLAGS = $(LD_FLAGS) $(ROOT_LIBS) -shared 
 EXE_FLAGS = $(LD_FLAGS) $(ROOT_LIBS) $(LOCAL_LIBS) -Iinclude/
@@ -41,7 +41,7 @@ EXESRCS    = $(wildcard ../src_bin/*.cc)
 
 # Make sure the executables can find the library above
 #LOCAL_LIBS = -L$(LIBDIR) -lXsecVary1D_NDGAr -L/vols/dune/nk3717/duneanaobj_build/build/install/lib -lduneanaobj_StandardRecord
-LOCAL_LIBS = -L$(LIBDIR) -lXsecVary2D_NDGAr -L/vols/dune/nk3717/duneanaobj_build/build/install/lib -lduneanaobj_StandardRecord
+LOCAL_LIBS = -L$(LIBDIR) -lXsecVary2D_NDGAr -L/vols/dune/nk3717/duneanaobj_build_v2CAFs/build/install/lib -lduneanaobj_StandardRecord
 
 
 

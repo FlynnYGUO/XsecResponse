@@ -22,14 +22,14 @@
 
 declare -i i=0
 
-for entry in $(ls ../../data/NDGAr_testCAFs/*numuselec.root); 
+for entry in $(ls ../../data/NDGAr_100kCAFs/Outputs/*nuebar_numuselec.root); 
 do
   declare -i j=0
-  for entry2 in $(ls ../../data/NDGAr_testCAFs/Weights/*numuselec_weight.root); 
+  for entry2 in $(ls ../../data/NDGAr_100kCAFs/Weights/*nuebar_numuselec_weight.root); 
   do
     infile=${entry##*/}
-    outfile2="../../data/NDGAr_testCAFs/SplineOutputs/"${infile%.root}"_2dsplines.root"
-    outfile3="../../data/NDGAr_testCAFs/SplineOutputs/"${infile%.root}"_2dsplines.txt"
+    outfile2="../../data/NDGAr_100kCAFs/SplineOutputs/"${infile%.root}"_2dsplinesnewreco.root"
+    outfile3="../../data/NDGAr_100kCAFs/SplineOutputs/"${infile%.root}"_2dsplinesnewreco.txt"
 #    com3="./build/bin/make_xsec_response_1d_NDGAr -w ${entry2} -m ${entry} -o ${outfile2} -selec numu &> ${outfile3} &"
     com3="./build/bin/make_xsec_response_2d_NDGAr -w ${entry2} -m ${entry} -o ${outfile2} &> ${outfile3} &"
     if [ $i == $j ]
