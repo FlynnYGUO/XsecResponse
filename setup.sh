@@ -3,18 +3,29 @@
 #
 #!/bin/bash
 
-export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH
-
-
-export ROOTSYS=/vols/t2k/users/pjd12/analysiswork/t2kreweightthings/psychedir/ROOT/v5r34p34n00/Linux-x86_64
-
 
 #SETUP CMAKE AND ROO FROM CVMFS
-source /cvmfs/dune.opensciencegrid.org/products/dune/setup_dune.sh    
-setup cmake v3_12_2 -f Linux64bit+3.10-2.17
-setup root v6_18_02a -f Linux64bit+3.10-2.17 -q e17:prof
+source /cvmfs/larsoft.opensciencegrid.org/spack-packages/setup-env.sh
+
+spack load python@3.9.15
+echo “root”
+spack load root@6.28.12
+echo “cmake”
+spack load cmake@3.27.7
+echo “gcc”
+spack load gcc@12.2.0%gcc@11.4.1
+spack load fife-utils@3.7.0
+spack load metacat@4.0.0
+spack load rucio-clients@33.3.0
+spack load sam-web-client@3.4%gcc@12.2.0
+spack load r-m-dd-config@1.0 experiment=dune
+export IFDH_CP_MAXRETRIES=0\0\0\0\0
+
 export CXX=`which g++` # this might be specific for Fermilab?
 export CC=`which gcc` # this might be specific for Fermilab?
+
+export LD_LIBRARY_PATH=$PWD/src_lib:$LD_LIBRARY_PATH
+
 
 # GENIE and dependencies
 # Only needed with ./configure --enable-genie
@@ -29,6 +40,6 @@ export CC=`which gcc` # this might be specific for Fermilab?
 #export LHAPDF_INC=/path/to/lhapdf/include/
 #export LHAPATH=/path/to/lhapdf/PDFsets
 #export PATH=$GENIE/bin:$PATH;
-
-# For Mac's
-export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
+#
+# # For Mac's
+# export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
